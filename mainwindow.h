@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 
+#include "Contoller.h"
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -17,5 +20,6 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    Contoller contoller;
 };
 #endif // MAINWINDOW_H
