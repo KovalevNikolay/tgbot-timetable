@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,11 +15,16 @@ message($$QT_TG_BOT)
 include($$QT_TG_BOT/QtTelegramBot.pri)
 
 SOURCES += \
+    Controller.cpp \
+    Database.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h
+    Controller.h \
+    Database.h \
+    mainwindow.h \
+    types.h
 
 FORMS += \
     mainwindow.ui
