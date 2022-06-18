@@ -343,8 +343,8 @@ bool Bot::_sendPayload(QVariant chatId, QFile *filePayload, ParameterList params
 
 bool Bot::_sendPayload(QVariant chatId, QString textPayload, ParameterList params, qint32 replyToMessageId, const GenericReply &replyMarkup, QString payloadField, QString endpoint)
 {
-    if (chatId.type() != QVariant::String && chatId.type() != QVariant::Int) {
-        qCritical("Please provide a QString or int as chatId");
+    if (chatId.type() != QVariant::String && chatId.type() != QVariant::Int && chatId.type() != QVariant::LongLong && chatId.type() != QVariant::ULongLong) {
+        qCritical("Please provide a QString or uint32 or uint64 as chatId");
         return false;
     }
     params.insert("chat_id", HttpParameter(chatId));
