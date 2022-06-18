@@ -75,5 +75,6 @@ inline QDebug operator<< (QDebug dbg, const Message &message)
 }
 
 }
+Q_DECLARE_METATYPE(Telegram::Message)
 
 #endif // MESSAGE_H

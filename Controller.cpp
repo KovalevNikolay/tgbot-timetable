@@ -3,6 +3,7 @@
 Controller::Controller(QObject *parent)
     : QObject{parent}
 {
+    qRegisterMetaType<Telegram::Message>("Message");
     load_db();
 }
 
