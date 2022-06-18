@@ -13,7 +13,7 @@ public:
     User() : id(0), firstname(QString()), lastname(QString()), username(QString()) {}
     User(QJsonObject user);
 
-    qint32 id;
+    qint64 id;
     QString firstname;
     QString lastname;
     QString username;

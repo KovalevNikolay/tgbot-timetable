@@ -31,7 +31,7 @@ User Bot::getMe()
                 m_net->request(ENDPOINT_GET_ME, ParameterList(), Networking::GET));
 
     User ret;
-    ret.id = json.value("id").toInt();
+    ret.id = json.value("id").toDouble();
     ret.firstname = json.value("first_name").toString();
     ret.lastname = json.value("last_name").toString();
     ret.username = json.value("username").toString();
