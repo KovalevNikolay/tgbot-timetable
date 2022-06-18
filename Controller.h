@@ -15,8 +15,14 @@ signals:
 private:
     void load_db();
 
+private slots:
+    void handle_msg(Telegram::Message msg);
+
 private:
-    Database db_users;
+    Telegram::Bot *m_bot;
+    QString        m_token;
+
+    Database       m_db_users;
     //Database db_ ? // TODO database school data?
 };
 

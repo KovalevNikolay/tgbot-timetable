@@ -1,6 +1,7 @@
 #include "qttelegrambot.h"
 
 using namespace Telegram;
+// https://telegram-bot-sdk.readme.io/reference/
 
 Bot::Bot(QString token, bool updates, quint32 updateInterval, quint32 pollingTimeout, QObject *parent) :
     QObject(parent),

@@ -3,6 +3,8 @@
 
 #include "Controller.h"
 #include <QMainWindow>
+#include <QThread>
+#include <QThreadPool>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +20,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    Controller ctrl;
+    Controller m_ctrl;
+    QThread *t_ctrl;
 };
 #endif // MAINWINDOW_H
