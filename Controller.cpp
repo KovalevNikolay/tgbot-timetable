@@ -18,9 +18,14 @@ void Controller::load_db()
 
 }
 
-void Controller::handle_msg(Telegram::Message msg)
+void Controller::handle_msg(const Telegram::Message msg)
 {
     qDebug() << msg;
+
+    switch(msg.type)
+    {
+        //case: break;
+    }
 
     // TODO
 }

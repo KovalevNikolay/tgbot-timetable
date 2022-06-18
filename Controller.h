@@ -16,7 +16,7 @@ private:
     void load_db();
 
 private slots:
-    void handle_msg(Telegram::Message msg);
+    void handle_msg(const Telegram::Message msg);
 
 private:
     Telegram::Bot *m_bot;
