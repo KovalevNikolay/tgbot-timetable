@@ -65,11 +65,12 @@ public:
 
 inline QDebug operator<< (QDebug dbg, const Message &message)
 {
-    dbg.nospace() << qUtf8Printable(QString("Telegram::Message(id=%1; date=%2; chat=%3; type=%4)")
+    dbg.nospace() << qUtf8Printable(QString("Telegram::Message(id=%1; date=%2; chat=%3; type=%4) msg[%5]")
                                     .arg(message.id)
                                     .arg(message.date.toString("dd.MM.yyyy hh:mm:ss"))
                                     .arg("Chat(" + QString::number(message.chat.id) + ")")
-                                    .arg(message.type));
+                                    .arg(message.type)
+                                    .arg((message.type == Message::TextType)? message.string :""));
 
     return dbg.maybeSpace();
 }
