@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>imgs/icons/telegram_64px.png</file>
+        <file>imgs/icons/telegram_64px.ico</file>
+    </qresource>
+</RCC>
