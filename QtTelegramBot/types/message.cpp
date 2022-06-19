@@ -5,7 +5,7 @@ using namespace Telegram;
 Message::Message(QJsonObject message)
 {
     id = message.value("message_id").toInt();
-    date = QDateTime::fromMSecsSinceEpoch(message.value("date").toInt());
+    date = QDateTime::fromSecsSinceEpoch(message.value("date").toInt());
     chat = Chat(message.value("chat").toObject());
 
     /**
