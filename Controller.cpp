@@ -8,9 +8,6 @@ Controller::Controller(QObject *parent)
 
     m_bot = new Telegram::Bot(/*m_token*/"5453283933:AAE29S8gGaYmbKRJQvYkZgT7i02InT-T6Sk", true, 500, 4);
     QObject::connect(m_bot, &Telegram::Bot::message, this,  &Controller::handle_msg);
-
-    auto me = m_bot->getMe();
-    qDebug() << me;
 }
 
 void Controller::load_db()
@@ -56,4 +53,13 @@ void Controller::handle_msg(const Telegram::Message msg)
 
 
     // TODO
+}
+
+void Controller::update_bot_info()
+{
+    auto me = m_bot->getMe();
+    emit update_id(QString::number(me.id));
+    emit update_fn(me.username);
+    emit update_username(me.firstname);
+    qDebug() << me;
 }
