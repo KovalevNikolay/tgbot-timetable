@@ -8,13 +8,13 @@
 #include <QSqlDatabase>
 #include <types.h>
 
-using user_id = qint32;
-
 class Database : public QObject
 {
     Q_OBJECT
 public:
     explicit Database(QObject *parent = nullptr);
+
+    User& find_or_create(const user_id id);
 
 signals:
 

@@ -12,6 +12,7 @@ class User
 public:
     User() : id(0), firstname(QString()), lastname(QString()), username(QString()) {}
     User(QJsonObject user);
+    User(const quint64 id) : id(id), firstname(QString()), lastname(QString()), username(QString()) {}
 
     qint64 id;
     QString firstname;

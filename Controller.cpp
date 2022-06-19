@@ -22,10 +22,38 @@ void Controller::handle_msg(const Telegram::Message msg)
 {
     qDebug() << msg;
 
-    switch(msg.type)
+    auto &user = m_db_users.find_or_create(msg.from.id);
+    user.updateMsg(msg);
+
+    if(!user.is_banned)
     {
-        //case: break;
+        switch(msg.type)
+        {
+            case Telegram::Message::TextType:
+            {
+                m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
+                break;
+            }
+            case Telegram::Message::AudioType: break;
+            case Telegram::Message::DocumentType: break;
+            case Telegram::Message::StickerType: break;
+            case Telegram::Message::VideoType: break;
+            case Telegram::Message::VoiceType: break;
+            case Telegram::Message::ContactType: break;
+            case Telegram::Message::LocationType: break;
+            case Telegram::Message::NewChatParticipantType: break;
+            case Telegram::Message::LeftChatParticipantType: break;
+            case Telegram::Message::NewChatTitleType: break;
+            case Telegram::Message::NewChatPhotoType: break;
+            case Telegram::Message::DeleteChatPhotoType: break;
+            case Telegram::Message::GroupChatCreatedType: break;
+            default: break;
+        }
+    } else
+    {
+        qDebug() << "Banned " << user.tg_user << " send message";
     }
+
 
     // TODO
 }
