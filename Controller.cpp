@@ -59,7 +59,7 @@ void Controller::update_bot_info()
 {
     auto me = m_bot->getMe();
     emit update_id(QString::number(me.id));
-    emit update_fn(me.username);
-    emit update_username(me.firstname);
+    emit update_fn(me.firstname);
+    emit update_username(me.username);
     qDebug() << me;
 }
