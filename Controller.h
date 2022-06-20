@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "Database.h"
-
+#include "Settings.h"
 
 class Controller : public QObject
 {
@@ -23,10 +23,10 @@ private slots:
     void handle_msg(const Telegram::Message msg);
 
 private:
-    Telegram::Bot *m_bot;
-    QString        m_token;
-
     Database       m_db_users;
+    Telegram::Bot *m_bot;
+    Settings      *m_settings;
+
     //Database db_ ? // TODO database school data?
 
 public slots:

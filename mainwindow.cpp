@@ -16,8 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this, &MainWindow::destroyed, t_ctrl, &QThread::quit);
     t_ctrl->start(QThread::NormalPriority);
 
-
-
     // GUI
     QObject::connect(&m_ctrl, &Controller::update_id, this, &MainWindow::update_id);
     QObject::connect(&m_ctrl, &Controller::update_fn, this, &MainWindow::update_fn);

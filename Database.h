@@ -8,6 +8,8 @@
 #include <QSqlDatabase>
 #include <types.h>
 
+#include <QDebug>
+
 class Database : public QObject
 {
     Q_OBJECT
@@ -16,15 +18,18 @@ public:
 
     User& find_or_create(const user_id id);
 
+public:
+    QString m_login_db;
+    QString m_password_db;
+
 signals:
 
 private:
     void connect_db();
 
-private:
-    QString m_login_db;
-    QString m_password_db;
+private slots:
 
+private:
     QMap<user_id, User> m_users;
 };
 
