@@ -3,10 +3,12 @@
 Controller::Controller(QObject *parent)
     : QObject{parent}
 {
+    m_settings = new Settings(m_db_users);
+
     qRegisterMetaType<Telegram::Message>("Message");
     load_db();
 
-    m_bot = new Telegram::Bot(/*m_token*/"5453283933:AAE29S8gGaYmbKRJQvYkZgT7i02InT-T6Sk", true, 500, 4);
+    m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
     QObject::connect(m_bot, &Telegram::Bot::message, this,  &Controller::handle_msg);
 }
 
