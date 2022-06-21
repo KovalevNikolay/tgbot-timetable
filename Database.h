@@ -22,7 +22,7 @@ public:
 
     QSqlError connect_db();
     QSqlError disconnect_db();
-    QVariant  sql_request();
+    QVariant  sql_request(QString &request);
 
 public:
     QString m_login_db;
