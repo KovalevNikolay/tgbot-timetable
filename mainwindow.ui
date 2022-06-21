@@ -100,7 +100,7 @@ background:  rgb(65, 65, 65);
 </string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="movable">
        <bool>true</bool>
@@ -375,7 +375,7 @@ background-color: rgb(80, 80, 80);
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
