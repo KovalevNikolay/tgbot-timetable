@@ -13,8 +13,8 @@ void Settings::read_settings()
     {
         qDebug() << "Settings path: " << current_dir.absolutePath() << " settings file \"" SETTINGS_FILE_NAME "\" not found. Write default settings...";
         m_token            = "1234567890:DeafaltYourTokenAbCdEfTG7i72InT-L4Sz";
-        m_db.m_login_db    = "Default login";
-        m_db.m_password_db = "Default password";
+        m_db.m_login_db    = "";
+        m_db.m_password_db = "";
         write_settings();
     }
 
