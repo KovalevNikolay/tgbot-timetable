@@ -22,12 +22,14 @@ include($$QT_TG_BOT/QtTelegramBot.pri)
 SOURCES += \
     Controller.cpp \
     Database.cpp \
+    Settings.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     Controller.h \
     Database.h \
+    Settings.h \
     mainwindow.h \
     types.h
 
