@@ -5,8 +5,10 @@
 #include <QString>
 #include <QObject>
 #include <QSql>
+#include <QSqlError>
 #include <QSqlDatabase>
 #include <types.h>
+#include <QVariant>
 
 #include <QDebug>
 
@@ -18,6 +20,10 @@ public:
 
     User& find_or_create(const user_id id);
 
+    QSqlError connect_db();
+    QSqlError disconnect_db();
+    QVariant  sql_request();
+
 public:
     QString m_login_db;
     QString m_password_db;
@@ -25,7 +31,7 @@ public:
 signals:
 
 private:
-    void connect_db();
+
 
 private slots:
 
