@@ -100,7 +100,7 @@ background:  rgb(65, 65, 65);
 </string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="movable">
        <bool>true</bool>
@@ -145,7 +145,7 @@ background-color: rgb(80, 80, 80);
          <string>Start bot</string>
         </property>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>5</x>
@@ -375,7 +375,7 @@ background-color: rgb(80, 80, 80);
      <x>0</x>
      <y>0</y>
      <width>1280</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

@@ -10,6 +10,10 @@
 #include <types.h>
 #include <QVariant>
 
+#include <QSqlQuery>
+#include <QSqlTableModel>
+#include <QSqlRecord>
+
 #include <QDebug>
 
 class Database : public QObject
@@ -20,7 +24,7 @@ public:
 
     User& find_or_create(const user_id id);
 
-    QSqlError connect_db();
+    QSqlError connect_db (QString &name);
     QSqlError disconnect_db();
     QVariant  sql_request(QString &request);
 
@@ -31,8 +35,7 @@ public:
 signals:
 
 private:
-
-
+    QSqlDatabase db;
 private slots:
 
 private:
