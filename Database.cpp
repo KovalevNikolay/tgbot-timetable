@@ -12,7 +12,7 @@ QSqlError Database::connect_db(const QString &name)
     QDir curr_path(QDir::currentPath());
     if(!curr_path.exists(curr_path.absolutePath() + name)) qCritical() << "Not found: " << curr_path.absolutePath() << name;
 
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QSQLITE", name);
     db.setDatabaseName(name);
     if(m_login_db.isEmpty() ^ m_password_db.isEmpty()) qWarning() << "Login or password db is empty, but other not empty, try connect.."; // FIXME maybe change text warning /nothink
     db.open();
