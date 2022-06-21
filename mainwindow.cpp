@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "Contoller.h"
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -32,11 +35,11 @@ MainWindow::~MainWindow()
 }
 void MainWindow::update_id(QString text)
 {
-    ui->label_first_name_value->setText(text);
+    ui->label_id_value->setText(text);
 }
 void MainWindow::update_fn(QString text)
 {
-    ui->label_id_value->setText(text);
+    ui->label_first_name_value->setText(text);
 }
 void MainWindow::update_username(QString text)
 {

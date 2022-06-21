@@ -2,6 +2,9 @@
 #define CONTROLLER_H
 
 #include <QObject>
+#include <QMap>
+#include <QtConcurrent>
+#include <QFutureSynchronizer>
 #include "Database.h"
 #include "Settings.h"
 
@@ -17,15 +20,24 @@ signals:
     void update_username(QString);
 
 private:
-    void load_db();
+    User& find_or_create(const user_id id);
+    void  load_db();
+    void  load_db_users();
+    void  load_db_school();
 
 private slots:
     void handle_msg(const Telegram::Message msg);
 
 private:
-    Database       m_db_users;
-    Telegram::Bot *m_bot;
-    Settings      *m_settings;
+    QMap<user_id, User> m_users;
+    // TODO impl me m_school_data;
+    // TODO impl me m_other_data; // if need
+
+    Database            m_db_users;
+    Database            m_db_school;
+
+    Telegram::Bot      *m_bot;
+    Settings           *m_settings;
 
     //Database db_ ? // TODO database school data?
 

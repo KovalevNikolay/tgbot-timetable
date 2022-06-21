@@ -13,7 +13,7 @@ class Settings : public QObject
 {
     Q_OBJECT
 public:
-    explicit Settings(Database &db, QObject *parent = nullptr);
+    explicit Settings(Database &db, QObject *parent = nullptr); // FIXME 1 arg make QList<>
     void write_settings();
 
     QString   m_token;

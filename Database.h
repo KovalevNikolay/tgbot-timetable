@@ -1,16 +1,20 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <QMap>
 #include <QString>
 #include <QObject>
+#include <QDebug>
+#include <types.h>
+
+#include <QDir>
 #include <QSql>
 #include <QSqlError>
 #include <QSqlDatabase>
-#include <types.h>
-#include <QVariant>
+#include <QSqlQuery>
+#include <QSqlRecord>
 
-#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
 
 class Database : public QObject
 {
@@ -18,25 +22,17 @@ class Database : public QObject
 public:
     explicit Database(QObject *parent = nullptr);
 
-    User& find_or_create(const user_id id);
-
-    QSqlError connect_db();
-    QSqlError disconnect_db();
-    QVariant  sql_request(QString &request);
+    QSqlError         connect_db(const QString &name);
+    void              disconnect_db();
+    QList<QSqlRecord> sql_request(const QString &request);
 
 public:
     QString m_login_db;
     QString m_password_db;
 
-signals:
-
 private:
-
-
-private slots:
-
-private:
-    QMap<user_id, User> m_users;
+    QMutex       m_mtx;
+    QSqlDatabase db;
 };
 
 #endif // DATABASE_H
