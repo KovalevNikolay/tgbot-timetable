@@ -31,5 +31,6 @@ public slots:
 
 private slots:
     void h_btn_start_stop();
+
 };
 #endif // MAINWINDOW_H

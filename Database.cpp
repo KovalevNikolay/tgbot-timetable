@@ -6,25 +6,36 @@ Database::Database(QObject *parent)
 
 }
 
-User& Database::find_or_create(const user_id id)
+QSqlError Database::connect_db(const QString &name)
 {
-    auto it = m_users.find(id);
-    if(it != m_users.end())
-    {
-        return *it;
-    } else
-    {
-        Telegram::User user(id);
-        it = m_users.insert(id, user);
-        qDebug() << "User created " << user;
+    QMutexLocker lock(&m_mtx);
+    QDir curr_path(QDir::currentPath());
+    if(!curr_path.exists(curr_path.absolutePath() + name)) qCritical() << "Not found: " << curr_path.absolutePath() << name;
 
-        User user_db(user);
-        // QtConcurence::run([&user_db](){
-        //
-        // TODO async write user data to database with .sql
-        // NOTE dont forget mutex in writer method db if its need
-        //  });
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(name);
+    if(m_login_db.isEmpty() ^ m_password_db.isEmpty()) qWarning() << "Login or password db is empty, but other not empty, try connect.."; // FIXME maybe change text warning /nothink
+    db.open();
 
-        return *it;
-    }
+    return db.lastError();
+}
+
+void Database::disconnect_db()
+{
+    QMutexLocker lock(&m_mtx);
+    qDebug() << db.databaseName() << " disconnected";
+    db.close();
+}
+
+QList<QSqlRecord> Database::sql_request(const QString &request)
+{
+    QMutexLocker lock(&m_mtx);
+    QList<QSqlRecord> res;
+    QSqlQuery query = QSqlQuery(db);
+    if(!query.exec(request))
+    {
+        qDebug() << query.lastError().databaseText();
+        qDebug() << query.lastError().driverText();
+    } else while(query.next()) res << query.record(); // FIXME maybe change while to do while, because query.next() ?
+    return res;
 }
