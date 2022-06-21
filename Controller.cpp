@@ -50,7 +50,7 @@ void Controller::load_db_users()
 void Controller::load_db_school()
 {
     qInfo() << "Load database school";
-    //m_db_school.connect_db("school.db");
+    m_db_school.connect_db("school.db");
     // TODO
 }
 void Controller::handle_msg(const Telegram::Message msg)
