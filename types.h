@@ -19,6 +19,7 @@ struct User
     Telegram::User tg_user;
     bool           is_banned { false };
     QDateTime      ban_tp;
+    bool           isNeedUpdate { false };
 
     Telegram::Message last_msg;
     QDateTime         last_msg_tp;

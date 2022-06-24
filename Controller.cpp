@@ -21,13 +21,11 @@ User& Controller::find_or_create(const user_id id)
     {
         Telegram::User user(id);
         it = m_users.insert(id, user);
+        it->isNeedUpdate = true;
         qInfo() << "User created " << user;
 
         User user_db(user);
-        // QtConcurence::run([&user_db](){
-        //
-        // TODO async write user data to users.db
-        //  });
+
 
         return *it;
     }
@@ -42,16 +40,48 @@ void Controller::load_db_users()
 {
     qInfo() << "Load database users";
     m_db_users.connect_db("users.db");
-    // TODO fill m_users
-    // get count users
-    // foreach() m_users.insert
-    // etc.
+
+    for (int i=0; i<m_db_users.sql_request("SELECT * FROM users").size(); i++)
+
+    {
+       Telegram::User user_from_db;
+
+       User user(user_from_db);
+       user.tg_user.id=m_db_users.sql_request("SELECT * FROM users")[i].field("user_id").value().toUInt();
+       user.tg_user.firstname=m_db_users.sql_request("SELECT * FROM users")[i].field("firstName").value().toString();
+       user.tg_user.lastname=m_db_users.sql_request("SELECT * FROM users")[i].field("lastName").value().toString();
+       user.tg_user.username=m_db_users.sql_request("SELECT * FROM users")[i].field("userName").value().toString();
+       user.last_msg_tp=QDateTime::fromSecsSinceEpoch(m_db_users.sql_request("SELECT * FROM users")[i].field("last_msg_tp").value().toUInt());
+       user.is_banned=m_db_users.sql_request("SELECT * FROM users")[i].field("is_banned").value().toBool();
+       user.ban_tp=QDateTime::fromSecsSinceEpoch(m_db_users.sql_request("SELECT * FROM users")[i].field("ban_tp").value().toUInt());
+       //user.last_msg=m_db_users.sql_request("SELECT * FROM users")[i].field("last_msg").value().toString();
+
+       m_users.insert(user.tg_user.id, user);
+
+    }
+
+    //
+
+
+    //list_users.clear();
 }
 void Controller::load_db_school()
 {
     qInfo() << "Load database school";
     m_db_school.connect_db("school.db");
     // TODO
+}
+void Controller::write_users_to_db()
+{
+    for (auto &el : m_users)
+    {
+        if (el.isNeedUpdate)
+        {
+            QString req = "INSERT INTO users (user_id, firstName, lastName, userName, last_msg_tp, is_banned, ban_tp, last_msg)"
+                          "VALUES (:user_id, :firstName, :lastName, :userName, :last_msg_tp, :is_banned, :ban_tp, :last_msg)";
+            m_db_users.sql_insert_user(req, el);
+        }
+    }
 }
 void Controller::handle_msg(const Telegram::Message msg)
 {

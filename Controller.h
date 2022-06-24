@@ -24,6 +24,7 @@ private:
     void  load_db();
     void  load_db_users();
     void  load_db_school();
+    void  write_users_to_db();
 
 private slots:
     void handle_msg(const Telegram::Message msg);

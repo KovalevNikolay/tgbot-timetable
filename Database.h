@@ -12,6 +12,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlField>
 
 #include <QMutex>
 #include <QMutexLocker>
@@ -25,6 +26,7 @@ public:
     QSqlError         connect_db(const QString &name);
     void              disconnect_db();
     QList<QSqlRecord> sql_request(const QString &request);
+    void sql_insert_user(const QString &request, User &user);
 
 public:
     QString m_login_db;
