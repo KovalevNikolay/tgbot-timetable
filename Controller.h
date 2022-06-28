@@ -23,19 +23,22 @@ private:
     User& find_or_create(const user_id id);
     void  load_db();
     void  load_db_users();
-    void  load_db_school();
+    void  load_db_schedule();
     void  write_users_to_db();
+    void  write_schedule_to_db();
+    void  getScheduleOnDay(const int weekDayNumber, const User::settingsRole &setRole);
+    void  getScheduleOnWeek (const User::settingsRole &setRole);
 
 private slots:
     void handle_msg(const Telegram::Message msg);
 
 private:
     QMap<user_id, User> m_users;
-    // TODO impl me m_school_data;
+    QMap<int, Schedule> m_schedule;
     // TODO impl me m_other_data; // if need
 
     Database            m_db_users;
-    Database            m_db_school;
+    Database            m_db_schedule;
 
     Telegram::Bot      *m_bot;
     Settings           *m_settings;

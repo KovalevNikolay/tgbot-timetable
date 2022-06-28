@@ -34,7 +34,7 @@ void Controller::load_db()
 {
     QFutureSynchronizer<void> sync;
     sync.addFuture(QtConcurrent::run([this](){ load_db_users(); }));
-    sync.addFuture(QtConcurrent::run([this](){ load_db_school();}));
+    sync.addFuture(QtConcurrent::run([this](){ load_db_schedule();}));
 }
 void Controller::load_db_users()
 {
@@ -59,17 +59,26 @@ void Controller::load_db_users()
        m_users.insert(user.tg_user.id, user);
 
     }
-
-    //
-
-
-    //list_users.clear();
 }
-void Controller::load_db_school()
+void Controller::load_db_schedule()
 {
     qInfo() << "Load database school";
-    m_db_school.connect_db("school.db");
-    // TODO
+    m_db_schedule.connect_db("schedule.db");
+
+    Schedule schedule;
+
+    for (int i=0; i<m_db_schedule.sql_request("SELECT * FROM schedule").size(); i++)
+    {
+        schedule.scheduleID=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("ID").value().toInt();
+        schedule.classID=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("classID").value().toInt();
+        schedule.subjectID=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("subjectID").value().toInt();
+        schedule.teacherID=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("teacherID").value().toInt();
+        schedule.lessonID=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("lessonID").value().toInt();
+        schedule.weekDay=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("weekDay").value().toInt();
+        schedule.audienceNumber=m_db_schedule.sql_request("SELECT * FROM schedule")[i].field("audienceNumber").value().toInt();
+
+        m_schedule.insert(schedule.scheduleID, schedule);
+    }
 }
 void Controller::write_users_to_db()
 {
@@ -77,10 +86,83 @@ void Controller::write_users_to_db()
     {
         if (el.isNeedUpdate)
         {
-            QString req = "INSERT INTO users (user_id, firstName, lastName, userName, last_msg_tp, is_banned, ban_tp, last_msg)"
+            QString request = "INSERT INTO users (user_id, firstName, lastName, userName, last_msg_tp, is_banned, ban_tp, last_msg)"
                           "VALUES (:user_id, :firstName, :lastName, :userName, :last_msg_tp, :is_banned, :ban_tp, :last_msg)";
-            m_db_users.sql_insert_user(req, el);
+            m_db_users.sql_insert_user(request, el);
         }
+    }//Update data SQL request;
+}
+void Controller::write_schedule_to_db()
+{
+    for (auto &el : m_schedule)
+    {
+        QString request = "INSERT INTO schedule (classID, subjectID, teacherID, lessonID, weekDay, audienceNumber) "
+                          "VALUES (:classID, :subjectID, :teacherID, :lessonID, :weekDay, :audienceNumber)";
+        m_db_schedule.sql_insert_schedule(request, el);
+    }
+    //it is needed convert classes fields to strings to simplify sql_insert_schedule and sql_insert_users methods
+}
+
+void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsRole &setRole)
+{
+    QString request;
+    if (setRole.roleName=="student")
+    {
+        request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNubmer "
+                "FROM schedule "
+                    "INNER JOIN classes ON schedule.classID = classes.classID "
+                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
+                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
+                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
+                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
+                "WHERE schedule.weekDay = "+QString::number(weekDayNumber)+" "
+                      "AND classes.className= '"+QString::number(setRole.roleID)+"' "
+                "ORDER BY schedule.LessonID AND schedule.weekDay ";
+        m_db_schedule.sql_request(request);
+    }
+    else if (setRole.roleName=="teacher")
+    {
+        request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNubmer "
+                "FROM schedule "
+                    "INNER JOIN classes ON schedule.classID = classes.classID "
+                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
+                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
+                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
+                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
+                "WHERE schedule.weekDay = "+QString::number(weekDayNumber)+" "
+                      "AND teachers.teacherID= "+QString::number(setRole.roleID)+" "
+                "ORDER BY schedule.LessonID AND schedule.weekDay ";
+        m_db_schedule.sql_request(request);
+    }
+}
+void Controller::getScheduleOnWeek(const User::settingsRole &setRole)
+{
+    QString request;
+    if (setRole.roleName=="student")
+    {
+        request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNubmer "
+                "FROM schedule "
+                    "INNER JOIN classes ON schedule.classID = classes.classID "
+                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
+                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
+                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
+                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
+                "WHERE classes.className= '"+QString::number(setRole.roleID)+"' "
+                "ORDER BY schedule.LessonID AND schedule.weekDay ";
+        m_db_schedule.sql_request(request);
+    }
+    else if (setRole.roleName=="teacher")
+    {
+        request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNubmer "
+                "FROM schedule "
+                    "INNER JOIN classes ON schedule.classID = classes.classID "
+                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
+                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
+                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
+                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
+                "WHERE teachers.teacherID= "+QString::number(setRole.roleID)+" "
+                "ORDER BY schedule.LessonID AND schedule.weekDay ";
+        m_db_schedule.sql_request(request);
     }
 }
 void Controller::handle_msg(const Telegram::Message msg)
