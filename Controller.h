@@ -28,8 +28,8 @@ private:
     void  updateDataToSchedule();
     void  insertUserToDb(const User &user);
     void  insertScheduleToDb(const Schedule &schedule);
-    void  getScheduleOnDay(const int weekDayNumber, const User::settingsRole &setRole);
-    void  getScheduleOnWeek (const User::settingsRole &setRole);
+    void  getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings);
+    void  getScheduleOnWeek (const User::settingsRole &settings);
 
 private slots:
     void handle_msg(const Telegram::Message msg);

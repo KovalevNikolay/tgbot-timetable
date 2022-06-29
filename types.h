@@ -21,14 +21,18 @@ struct User
     QDateTime      ban_tp;
     bool           isNeedUpdate { false };
 
-    enum Status
+    enum class Role
+    {
+        teacher, student
+    };
+    enum class Status
     {
         admin, normal, guest
     } userStatus;
     struct settingsRole
     {
-        QString       roleName;
-        int       roleID;
+        Role          role;
+        int           roleID;
     } userRole;
 
     Telegram::Message last_msg;
