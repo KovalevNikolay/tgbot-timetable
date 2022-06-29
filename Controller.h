@@ -24,8 +24,10 @@ private:
     void  load_db();
     void  load_db_users();
     void  load_db_schedule();
-    void  write_users_to_db();
-    void  write_schedule_to_db();
+    void  updateDataToUsers();
+    void  updateDataToSchedule();
+    void  insertUserToDb(const User &user);
+    void  insertScheduleToDb(const Schedule &schedule);
     void  getScheduleOnDay(const int weekDayNumber, const User::settingsRole &setRole);
     void  getScheduleOnWeek (const User::settingsRole &setRole);
 

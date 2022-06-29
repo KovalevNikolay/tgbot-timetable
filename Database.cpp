@@ -5,7 +5,6 @@ Database::Database(QObject *parent)
 {
 
 }
-
 QSqlError Database::connect_db(const QString &name)
 {
     QMutexLocker lock(&m_mtx);
@@ -19,14 +18,12 @@ QSqlError Database::connect_db(const QString &name)
 
     return db.lastError();
 }
-
 void Database::disconnect_db()
 {
     QMutexLocker lock(&m_mtx);
     qDebug() << db.databaseName() << " disconnected";
     db.close();
 }
-
 QList<QSqlRecord> Database::sql_request(const QString &request)
 {
     QMutexLocker lock(&m_mtx);
@@ -38,19 +35,4 @@ QList<QSqlRecord> Database::sql_request(const QString &request)
         qDebug() << query.lastError().driverText();
     } else while(query.next()) res << query.record(); // FIXME maybe change while to do while, because query.next() ?
     return res;
-}
-
-void Database::sql_insert_user(const QString &request, User &user)
-{
-    QSqlQuery query=QSqlQuery(db);
-    query.prepare(request);
-    query.bindValue(":user_id", user.tg_user.id);
-    query.bindValue(":firstName", user.tg_user.firstname);
-    query.bindValue(":lastName", user.tg_user.lastname);
-    query.bindValue(":userName", user.tg_user.username);
-    query.bindValue(":last_msg_tp", user.last_msg_tp);
-    query.bindValue(":is_banned", user.is_banned);
-    query.bindValue(":ban_tp", user.ban_tp);
-    query.bindValue(":last_msg", user.last_msg.string); // user.last_msg.(typedata??????)
-    query.exec();
 }
