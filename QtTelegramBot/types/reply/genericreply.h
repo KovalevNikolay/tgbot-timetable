@@ -21,22 +21,14 @@ public:
      */
     bool selective;
 
-    virtual QString serialize() const {
-        return QString();
-    }
-
-    bool isValid() const {
-        return valid;
-    }
+    virtual QString serialize() const { return QString(); }
+    inline bool isValid() const { return valid; }
 
 private:
     bool valid;
 
 protected:
-    QByteArray serializeJson(QJsonObject o) const {
-        QJsonDocument d = QJsonDocument(o);
-        return d.toJson(QJsonDocument::Compact);
-    }
+    QByteArray serializeJson(QJsonObject &o) const { return QJsonDocument(o).toJson(QJsonDocument::Compact); }
 };
 
 }

@@ -17,18 +17,15 @@ public:
           switch_inline_query(switch_inline_query),
           switch_inline_query_current_chat(switch_inline_query_current_chat)
     {
-        object = QJsonObject();
         object.insert("text", text);
-        if (!url.isEmpty()) {
+        if(!url.isEmpty())
+        {
             object.insert("url", url);
             return;
         }
-        if (!callback_data.isEmpty())
-            object.insert("callback_data", callback_data);
-        if (!switch_inline_query.isEmpty())
-            object.insert("switch_inline_query", switch_inline_query);
-        if (!switch_inline_query_current_chat.isEmpty())
-            object.insert("switch_inline_query_current_chat", switch_inline_query_current_chat);
+        if(!callback_data.isEmpty())                    object.insert("callback_data", callback_data);
+        if(!switch_inline_query.isEmpty())              object.insert("switch_inline_query", switch_inline_query);
+        if(!switch_inline_query_current_chat.isEmpty()) object.insert("switch_inline_query_current_chat", switch_inline_query_current_chat);
     }
     /**
      * @text - Label text on the button
@@ -69,22 +66,24 @@ class InlineKeyboardMarkup : public GenericReply
 public:
     InlineKeyboardMarkup(InlineKeyboardButtons buttons)
         : GenericReply(false),
-          buttons(buttons) { qDebug()<<"InlineKeyboardMarkup Constructor";}
+          buttons(buttons) { qDebug() << "InlineKeyboardMarkup Constructor";}
 
     /**
      * @buttons - Array of button rows, each represented by an Array of InlineKeyboardButton objects
      */
     InlineKeyboardButtons buttons;
 
-    virtual QString serialize() const {
-        QJsonObject o = QJsonObject();
-        QJsonArray keyboardButtons = QJsonArray();
-        foreach (InlineKeyboardButton button, buttons) {
+    virtual QString serialize() const
+    {
+        QJsonObject o;
+        QJsonArray  keyboardButtons;
+        foreach(InlineKeyboardButton button, buttons)
+        {
             QJsonArray array; array.append(button.toJsonObject());
             keyboardButtons.append(array);
         }
         o.insert("inline_keyboard", keyboardButtons);
-        qDebug()<<o;
+        qDebug() << o;
         return serializeJson(o);
     }
 };

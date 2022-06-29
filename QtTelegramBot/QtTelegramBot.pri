@@ -45,3 +45,5 @@ HEADERS += \
 
 OTHER_FILES += \
     $$PWD/README.md
+
+CONFIG(release, debug|release): DEFINES += QT_NO_DEBUG_OUTPUT

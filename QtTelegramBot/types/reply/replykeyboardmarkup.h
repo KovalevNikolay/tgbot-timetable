@@ -35,10 +35,12 @@ public:
      */
     bool oneTimeKeyboard;
 
-    virtual QString serialize() const {
-        QJsonObject o = QJsonObject();
-        QJsonArray keyboardMarkup = QJsonArray();
-        foreach (QStringList list, keyboard) {
+    virtual QString serialize() const
+    {
+        QJsonObject o;
+        QJsonArray  keyboardMarkup;
+        foreach(QStringList list, keyboard)
+        {
             keyboardMarkup.append(QJsonArray::fromStringList(list));
         }
         o.insert("keyboard", keyboardMarkup);

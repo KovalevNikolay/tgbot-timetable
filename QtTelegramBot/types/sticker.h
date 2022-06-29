@@ -14,11 +14,11 @@ public:
     Sticker() {}
     Sticker(QJsonObject sticker);
 
-    QString fileId;
-    quint16 width;
-    quint16 height;
+    QString   fileId;
+    quint16   width;
+    quint16   height;
     PhotoSize thumb;
-    quint64 fileSize;
+    quint64   fileSize;
 };
 
 inline QDebug operator<< (QDebug dbg, const Sticker &sticker)
@@ -29,10 +29,8 @@ inline QDebug operator<< (QDebug dbg, const Sticker &sticker)
                                     .arg(sticker.height)
                                     .arg("PhotoSize(" + sticker.thumb.fileId + ")")
                                     .arg(sticker.fileSize));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // STICKER_H

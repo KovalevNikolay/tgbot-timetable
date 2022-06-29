@@ -13,7 +13,7 @@ public:
     fileId(fileId), fileSize(fileSize), filePath(filePath) {}
 
     QString fileId;
-    qint64 fileSize;
+    qint64  fileSize;
     QString filePath;
 };
 
@@ -23,10 +23,8 @@ inline QDebug operator<< (QDebug dbg, const File &file)
                                     .arg(file.fileId)
                                     .arg(file.fileSize)
                                     .arg(file.filePath));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // FILE_H

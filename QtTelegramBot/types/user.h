@@ -14,7 +14,7 @@ public:
     User(QJsonObject user);
     User(const quint64 id) : id(id), firstname(QString()), lastname(QString()), username(QString()) {}
 
-    qint64 id;
+    qint64  id;
     QString firstname;
     QString lastname;
     QString username;
@@ -27,10 +27,8 @@ inline QDebug operator<< (QDebug dbg, const User &user)
                      .arg(user.firstname)
                      .arg(user.lastname)
                      .arg(user.username));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // USER_H

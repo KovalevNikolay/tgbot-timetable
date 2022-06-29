@@ -14,15 +14,17 @@ public:
     Chat(QJsonObject chat);
 
     enum ChatType {
-        Private, Group, Channel
+        Private,
+        Group,
+        Channel
     };
 
-    qint32 id;
+    qint32   id;
     ChatType type;
-    QString title;
-    QString username;
-    QString firstname;
-    QString lastname;
+    QString  title;
+    QString  username;
+    QString  firstname;
+    QString  lastname;
 };
 
 inline QDebug operator<< (QDebug dbg, const Chat &chat)
@@ -34,10 +36,8 @@ inline QDebug operator<< (QDebug dbg, const Chat &chat)
                                     .arg(chat.username)
                                     .arg(chat.firstname)
                                     .arg(chat.lastname));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // CHAT_H

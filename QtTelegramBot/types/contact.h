@@ -26,10 +26,8 @@ inline QDebug operator<< (QDebug dbg, const Contact &contact)
                                     .arg(contact.firstname)
                                     .arg(contact.lastname)
                                     .arg(contact.userId));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // CONTACT_H
