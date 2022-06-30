@@ -38,24 +38,23 @@ void Controller::load_db()
 void Controller::load_db_users()
 {
     qInfo() << "Load database users";
-    m_db_users.connect_db("/users.db");
+    m_db_users.connect_db("/users.db"); // FIXME use returned value
 
     Telegram::User user_from_db;
-    User user(user_from_db);
+    User     user(user_from_db);
 
     for (auto &el : m_db_users.sql_request("SELECT * FROM users"))
     {
-       user.tg_user.id=el.field("user_id").value().toUInt();
-       user.tg_user.firstname=el.field("firstName").value().toString();
-       user.tg_user.lastname=el.field("lastName").value().toString();
-       user.tg_user.username=el.field("userName").value().toString();
-       user.last_msg_tp=QDateTime::fromSecsSinceEpoch(el.field("last_msg_tp").value().toUInt());
-       user.is_banned=el.field("is_banned").value().toBool();
-       user.ban_tp=QDateTime::fromSecsSinceEpoch(el.field("ban_tp").value().toUInt());
+       user.tg_user.id        = el.field("user_id").value().toUInt();
+       user.tg_user.firstname = el.field("firstName").value().toString();
+       user.tg_user.lastname  = el.field("lastName").value().toString();
+       user.tg_user.username  = el.field("userName").value().toString();
+       user.last_msg_tp = QDateTime::fromSecsSinceEpoch(el.field("last_msg_tp").value().toUInt());
+       user.is_banned   = el.field("is_banned").value().toBool();
+       user.ban_tp      = QDateTime::fromSecsSinceEpoch(el.field("ban_tp").value().toUInt());
        //user.last_msg=m_db_users.sql_request("SELECT * FROM users")[i].field("last_msg").value().toString();
 
        m_users.insert(user.tg_user.id, user);
-
     }
 }
 void Controller::load_db_schedule()
@@ -122,7 +121,7 @@ void Controller::updateDataToSchedule()
         }
     }
 }
-void  Controller::insertUserToDb(const User &user)
+void Controller::insertUserToDb(const User &user)
 {
     QString request="INSERT INTO users (userID, userName, firstName, lastName, userStatus, isBanned, banTp, role, roleID, lastMsgTp, lastMsg)"
                     "VALUES ("+QString::number(user.tg_user.id)+", "
@@ -139,7 +138,7 @@ void  Controller::insertUserToDb(const User &user)
 
     m_db_users.sql_request(request);
 }
-void  Controller::insertScheduleToDb(const Schedule &schedule)
+void Controller::insertScheduleToDb(const Schedule &schedule)
 {
     QString request="INSERT INTO schedule (classID, subjectID, teacherID, lessonID, weekDay, audienceNumber)"
                     "VALUES ("+QString::number(schedule.classID)+", "
@@ -154,7 +153,7 @@ void  Controller::insertScheduleToDb(const Schedule &schedule)
 void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings)
 {
     QString request;
-    if (settings.role==User::Role::student)
+    if (settings.role == User::Role::student)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
                 "FROM schedule "
@@ -169,7 +168,7 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsR
 
         m_db_schedule.sql_request(request);
     }
-    else if (settings.role==User::Role::teacher)
+    else if (settings.role == User::Role::teacher)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNumber "
                 "FROM schedule "
@@ -188,7 +187,7 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsR
 void Controller::getScheduleOnWeek(const User::settingsRole &settings)
 {
     QString request;
-    if (settings.role==User::Role::student)
+    if (settings.role == User::Role::student)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
                 "FROM schedule "
@@ -201,7 +200,7 @@ void Controller::getScheduleOnWeek(const User::settingsRole &settings)
                 "ORDER BY schedule.LessonID AND schedule.weekDay ";
         m_db_schedule.sql_request(request);
     }
-    else if (settings.role==User::Role::teacher)
+    else if (settings.role == User::Role::teacher)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNumber "
                 "FROM schedule "
