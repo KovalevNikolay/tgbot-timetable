@@ -13,6 +13,7 @@ class Controller : public QObject
     Q_OBJECT
 public:
     explicit Controller(QObject *parent = nullptr);
+    ~Controller();
 
 signals:
     void update_id(QString);

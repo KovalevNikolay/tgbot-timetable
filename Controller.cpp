@@ -11,13 +11,16 @@ Controller::Controller(QObject *parent)
     m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
     QObject::connect(m_bot, &Telegram::Bot::message, this,  &Controller::handle_msg);
 }
+Controller::~Controller()
+{
+    updateDataToUsers();
+    updateDataToSchedule();
+}
 User& Controller::find_or_create(const user_id id)
 {
     auto it = m_users.find(id);
-    if(it != m_users.end())
-    {
-        return *it;
-    } else
+    if(it != m_users.end()) return *it;
+    else
     {
         Telegram::User user(id);
         it = m_users.insert(id, user);
@@ -38,7 +41,7 @@ void Controller::load_db()
 void Controller::load_db_users()
 {
     qInfo() << "Load database users";
-    m_db_users.connect_db("/users.db"); // FIXME use returned value
+    m_db_users.connect_db("users.db"); // FIXME use returned value
 
     Telegram::User user_from_db;
     User     user(user_from_db);
@@ -60,7 +63,7 @@ void Controller::load_db_users()
 void Controller::load_db_schedule()
 {
     qInfo() << "Load database school";
-    m_db_schedule.connect_db("/schedule.db");
+    m_db_schedule.connect_db("schedule.db");
 
     Schedule schedule;
 
