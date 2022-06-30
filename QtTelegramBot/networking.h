@@ -35,9 +35,9 @@ public:
         value(value.toByteArray()), isFile(isFile), mimeType(mimeType), filename(filename) {}
 
     QByteArray value;
-    bool isFile;
-    QString mimeType;
-    QString filename;
+    bool       isFile;
+    QString    mimeType;
+    QString    filename;
 };
 
 typedef QMap<QString, HttpParameter> ParameterList;
@@ -55,7 +55,7 @@ public:
 
 private:
     QNetworkAccessManager *m_nam;
-    QString m_token;
+    QString                m_token;
 
     QUrl buildUrl(QString endpoint);
     QByteArray parameterListToString(ParameterList list);
@@ -64,7 +64,6 @@ private:
     QByteArray generateMultipartFormData(ParameterList list, QByteArray boundary);
     QString generateRandomString(int length);
 };
-
 }
 
 #endif // NETWORKING_H

@@ -26,10 +26,8 @@ inline QDebug operator<< (QDebug dbg, const PhotoSize &photoSize)
                                     .arg(photoSize.width)
                                     .arg(photoSize.height)
                                     .arg(photoSize.fileSize));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // PHOTOSIZE_H

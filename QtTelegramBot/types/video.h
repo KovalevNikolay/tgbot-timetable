@@ -13,13 +13,13 @@ public:
     Video() {}
     Video(QJsonObject video);
 
-    QString fileId;
-    quint16 width;
-    quint16 height;
-    quint64 duration;
+    QString   fileId;
+    quint16   width;
+    quint16   height;
+    quint64   duration;
     PhotoSize thumb;
-    QString mimeType;
-    QString fileSize;
+    QString   mimeType;
+    QString   fileSize;
 };
 
 inline QDebug operator<< (QDebug dbg, const Video &video)
@@ -32,10 +32,8 @@ inline QDebug operator<< (QDebug dbg, const Video &video)
                                     .arg("PhotoSize(" + video.thumb.fileId + ")")
                                     .arg(video.mimeType)
                                     .arg(video.fileSize));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // VIDEO_H

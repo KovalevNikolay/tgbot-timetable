@@ -26,10 +26,8 @@ inline QDebug operator<< (QDebug dbg, const Voice &voice)
                                     .arg(voice.duration)
                                     .arg(voice.mimeType)
                                     .arg(voice.fileSize));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // VOICE_H

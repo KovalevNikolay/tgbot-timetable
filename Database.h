@@ -12,6 +12,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlField>
 
 #include <QMutex>
 #include <QMutexLocker>

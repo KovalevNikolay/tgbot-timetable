@@ -14,11 +14,11 @@ public:
     Document() {}
     Document(QJsonObject document);
 
-    QString fileId;
+    QString   fileId;
     PhotoSize thumb;
-    QString fileName;
-    QString mimeType;
-    quint64 fileSize;
+    QString   fileName;
+    QString   mimeType;
+    quint64   fileSize;
 };
 
 inline QDebug operator<< (QDebug dbg, const Document &document)
@@ -29,10 +29,8 @@ inline QDebug operator<< (QDebug dbg, const Document &document)
                                     .arg(document.fileName)
                                     .arg(document.mimeType)
                                     .arg(document.fileSize));
-
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // DOCUMENT_H

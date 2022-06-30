@@ -33,7 +33,6 @@ inline QDebug operator<< (QDebug dbg, const Audio &audio)
 
     return dbg.maybeSpace();
 }
-
 }
 
 #endif // AUDIO_H

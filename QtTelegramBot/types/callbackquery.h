@@ -23,9 +23,7 @@ public:
     QString chat_instance;
     QString data;
     QString game_short_name;
-    bool isEmpty() const {
-        return empty;
-    }
+    bool isEmpty() const { return empty; }
 private:
     bool empty;
 };

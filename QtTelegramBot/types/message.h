@@ -30,37 +30,37 @@ public:
     /**
      * @brief Telegram message events
      */
-    enum MessageType {
+    enum MessageType
+    {
         TextType, AudioType, DocumentType, PhotoType, StickerType, VideoType, VoiceType, ContactType,
         LocationType, NewChatParticipantType, LeftChatParticipantType, NewChatTitleType,
         NewChatPhotoType, DeleteChatPhotoType, GroupChatCreatedType
     };
 
     // required
-    quint32 id;
+    quint32   id;
     QDateTime date;
-    Chat chat;
+    Chat      chat;
 
     // optional
-    User from;
-    User forwardFrom;
+    User      from;
+    User      forwardFrom;
     QDateTime forwardDate;
-    Message *replyToMessage;
+    Message  *replyToMessage;
 
     MessageType type;
 
     // payload
-    QString string;
-    User user;
-    Audio audio;
-    Document document;
+    QString          string;
+    User             user;
+    Audio            audio;
+    Document         document;
     QList<PhotoSize> photo;
-    Sticker sticker;
-    Video video;
-    Voice voice;
-    Contact contact;
-    Location location;
-    bool boolean;
+    Sticker          sticker;
+    Video            video;
+    Voice            voice;
+    Contact          contact;
+    Location         location;
 };
 
 inline QDebug operator<< (QDebug dbg, const Message &message)
@@ -74,7 +74,6 @@ inline QDebug operator<< (QDebug dbg, const Message &message)
 
     return dbg.maybeSpace();
 }
-
 }
 Q_DECLARE_METATYPE(Telegram::Message)
 

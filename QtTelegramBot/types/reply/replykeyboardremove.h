@@ -16,11 +16,12 @@ class ReplyKeyboardRemove : public GenericReply
      */
     const bool removeKeyboard;
 
-    virtual QString serialize() const {
-        QJsonObject o = QJsonObject();
+    virtual QString serialize() const
+    {
+        QJsonObject o;
         o.insert("remove_keyboard", removeKeyboard);
         if(selective) o.insert("selective", selective);
-        qDebug()<< o;
+        qDebug() << o;
         return serializeJson(o);
     }
 };

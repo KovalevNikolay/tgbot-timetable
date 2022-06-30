@@ -17,8 +17,9 @@ public:
      */
     const bool hideKeyboard;
 
-    virtual QString serialize() const {
-        QJsonObject o = QJsonObject();
+    virtual QString serialize() const
+    {
+        QJsonObject o;
         o.insert("hide_keyboard", hideKeyboard);
         o.insert("selective", selective);
         return serializeJson(o);
