@@ -21,14 +21,8 @@ struct User
     QDateTime      ban_tp;
     bool           isNeedUpdate { false };
 
-    enum class Role
-    {
-        teacher, student
-    };
-    enum class Status
-    {
-        admin, normal, guest
-    } userStatus;
+    enum class Role   { teacher, student };
+    enum class Status { admin,   normal, guest } userStatus;
     struct settingsRole
     {
         Role          role;
@@ -40,10 +34,8 @@ struct User
 };
 struct Schedule
 {
-    Schedule(){}
-
     bool              isNeedUpdate { false };
-    int               scheduleID, classID, subjectID, teacherID, lessonID, weekDay, audienceNumber;
+    uint32_t          scheduleID, classID, subjectID, teacherID, lessonID, weekDay, audienceNumber;
 };
 
 #endif // TYPES_H
