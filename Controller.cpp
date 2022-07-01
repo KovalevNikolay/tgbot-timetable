@@ -38,7 +38,11 @@ void Controller::load_db()
 void Controller::load_db_users()
 {
     qInfo() << "Load database users";
-    m_db_users.connect_db("/users.db"); // FIXME use returned value
+    auto res = m_db_users.connect_db("/users.db"); // FIXME use returned value
+    if (res.isValid())
+    {
+
+    }
 
     Telegram::User user_from_db;
     User     user(user_from_db);
