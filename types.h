@@ -13,7 +13,7 @@ using tp      = std::chrono::time_point<std::chrono::steady_clock>;
 struct User
 {
     User() = delete;
-    User(const Telegram::User &User): tg_user(User), userStatus(Status::guest) {}
+    User(const Telegram::User &User): tg_user(User), userStatus(Status::regular) {}
     void updateMsg(const Telegram::Message &msg) { last_msg = msg; last_msg_tp = msg.date; };
 
     Telegram::User tg_user;
@@ -22,9 +22,10 @@ struct User
     bool           isNeedUpdate { false };
 
     enum class Role   { teacher, student };
-    enum class Status { admin,   normal, guest } userStatus;
+    enum class Status { admin,   donater, regular } userStatus;
     struct settingsRole
     {
+        QString       schoolName;
         Role          role;
         int           roleID;
     } userRole;
