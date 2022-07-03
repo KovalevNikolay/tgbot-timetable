@@ -14,7 +14,7 @@ struct User
 {
     User() = delete;
     User(const Telegram::User &User): tg_user(User), userStatus(Status::guest) {}
-    void updateMsg(const Telegram::Message &msg) { last_msg = msg; last_msg_tp = msg.date; };
+    void updateMsg(const Telegram::Message &msg) { last_msg = msg; last_msg_tp = msg.date; list_msg << msg;};
 
     Telegram::User tg_user;
     bool           is_banned { false };
@@ -29,8 +29,9 @@ struct User
         int           roleID;
     } userRole;
 
-    Telegram::Message last_msg;
-    QDateTime         last_msg_tp;
+    Telegram::Message        last_msg;
+    QDateTime                last_msg_tp;
+    QList<Telegram::Message> list_msg;
 };
 struct Schedule
 {
