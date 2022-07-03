@@ -8,6 +8,8 @@
 #include "Database.h"
 #include "Settings.h"
 
+#define CMD_START "/start"
+
 class Controller : public QObject
 {
     Q_OBJECT
@@ -22,15 +24,20 @@ signals:
 
 private:
     User& find_or_create(const user_id id);
-    void  load_db();
-    void  load_db_users();
-    void  load_db_schedule();
-    void  updateDataToUsers();
-    void  updateDataToSchedule();
-    void  insertUserToDb(const User &user);
-    void  insertScheduleToDb(const Schedule &schedule);
-    void  getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings);
-    void  getScheduleOnWeek (const User::settingsRole &settings);
+    void load_db();
+    void load_db_users();
+    void load_db_schedule();
+    void updateDataToUsers();
+    void updateDataToSchedule();
+    void insertUserToDb(const User &user);
+    void insertScheduleToDb(const Schedule &schedule);
+    void getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings);
+    void getScheduleOnWeek (const User::settingsRole &settings);
+
+    void handle_msg_guest(const User &user);
+    void handle_msg_normal(const User &user);
+    void handle_msg_admin(const User &user);
+
 
 private slots:
     void handle_msg(const Telegram::Message msg);

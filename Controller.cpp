@@ -227,6 +227,105 @@ void Controller::getScheduleOnWeek(const User::settingsRole &settings)
         m_db_schedule.sql_request(request);
     }
 }
+void Controller::handle_msg_guest(const User &user)
+{
+    const auto &msg = user.last_msg;
+    switch(msg.type)
+    {
+        case Telegram::Message::TextType:
+        {
+            if(msg.string == CMD_START)
+            {
+                m_bot->sendMessage(user.tg_user.id, "U new user or delete chat with bot"); // only test
+                // определить по полям user был такой челик или нет и в зависимости от этого высрать ответ
+            } else
+            {
+                m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
+            }
+            break;
+        }
+        // save
+        case Telegram::Message::AudioType: break;
+        case Telegram::Message::DocumentType: break;
+        case Telegram::Message::StickerType:
+        {
+            m_bot->sendMessage(user.tg_user.id, "Ты нахуя стикер кинул еблан");
+            break;
+        }
+        case Telegram::Message::VideoType: break;
+        case Telegram::Message::VoiceType: break;
+        case Telegram::Message::ContactType: break;
+        case Telegram::Message::LocationType: break;
+        // nothink
+        case Telegram::Message::NewChatParticipantType: break;
+        case Telegram::Message::LeftChatParticipantType: break;
+        case Telegram::Message::NewChatTitleType: break;
+        case Telegram::Message::NewChatPhotoType: break;
+        case Telegram::Message::DeleteChatPhotoType: break;
+        case Telegram::Message::GroupChatCreatedType: break;
+        default: break;
+    }
+}
+void Controller::handle_msg_normal(const User &user)
+{
+    const auto msg = user.last_msg;
+    switch(msg.type)
+    {
+        case Telegram::Message::TextType:
+        {
+            //m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
+            break;
+        }
+        // save
+        case Telegram::Message::AudioType: break;
+        case Telegram::Message::DocumentType: break;
+        case Telegram::Message::StickerType:
+        {
+            m_bot->sendMessage(user.tg_user.id, "Ты нахуя стикер кинул еблан");
+            break;
+        }
+        case Telegram::Message::VideoType: break;
+        case Telegram::Message::VoiceType: break;
+        case Telegram::Message::ContactType: break;
+        case Telegram::Message::LocationType: break;
+        // nothink
+        case Telegram::Message::NewChatParticipantType: break;
+        case Telegram::Message::LeftChatParticipantType: break;
+        case Telegram::Message::NewChatTitleType: break;
+        case Telegram::Message::NewChatPhotoType: break;
+        case Telegram::Message::DeleteChatPhotoType: break;
+        case Telegram::Message::GroupChatCreatedType: break;
+        default: break;
+    }
+}
+void Controller::handle_msg_admin(const User &user)
+{
+    const auto msg = user.last_msg;
+    switch(msg.type)
+    {
+        case Telegram::Message::TextType:
+        {
+            //m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
+            break;
+        }
+        // save
+        case Telegram::Message::AudioType: break;
+        case Telegram::Message::DocumentType: break;
+        case Telegram::Message::StickerType: break;
+        case Telegram::Message::VideoType: break;
+        case Telegram::Message::VoiceType: break;
+        case Telegram::Message::ContactType: break;
+        case Telegram::Message::LocationType: break;
+        // nothink
+        case Telegram::Message::NewChatParticipantType: break;
+        case Telegram::Message::LeftChatParticipantType: break;
+        case Telegram::Message::NewChatTitleType: break;
+        case Telegram::Message::NewChatPhotoType: break;
+        case Telegram::Message::DeleteChatPhotoType: break;
+        case Telegram::Message::GroupChatCreatedType: break;
+        default: break;
+    }
+}
 void Controller::handle_msg(const Telegram::Message msg)
 {
     qDebug() << msg;
@@ -236,35 +335,10 @@ void Controller::handle_msg(const Telegram::Message msg)
 
     if(!user.is_banned)
     {
-        switch(msg.type)
-        {
-            case Telegram::Message::TextType:
-            {
-                m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
-                break;
-            }
-            case Telegram::Message::AudioType: break;
-            case Telegram::Message::DocumentType: break;
-            case Telegram::Message::StickerType: break;
-            case Telegram::Message::VideoType: break;
-            case Telegram::Message::VoiceType: break;
-            case Telegram::Message::ContactType: break;
-            case Telegram::Message::LocationType: break;
-            case Telegram::Message::NewChatParticipantType: break;
-            case Telegram::Message::LeftChatParticipantType: break;
-            case Telegram::Message::NewChatTitleType: break;
-            case Telegram::Message::NewChatPhotoType: break;
-            case Telegram::Message::DeleteChatPhotoType: break;
-            case Telegram::Message::GroupChatCreatedType: break;
-            default: break;
-        }
-    } else
-    {
-        qDebug() << "Banned " << user.tg_user << " send message";
-    }
-
-
-    // TODO
+        if(user.userStatus == User::Status::guest)       handle_msg_guest(user);
+        else if(user.userStatus == User::Status::normal) handle_msg_normal(user);
+        else if(user.userStatus == User::Status::admin)  handle_msg_admin(user);
+    } else qInfo() << "Banned " << user.tg_user << " send message";
 }
 void Controller::update_bot_info()
 {
