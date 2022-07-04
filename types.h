@@ -13,21 +13,22 @@ using tp      = std::chrono::time_point<std::chrono::steady_clock>;
 struct User
 {
     User() = delete;
-    User(const Telegram::User &User): tg_user(User), userStatus(Status::guest) {}
-    void updateMsg(const Telegram::Message &msg) { last_msg = msg; last_msg_tp = msg.date; list_msg << msg;};
+    User(const Telegram::User &User): tg_user(User), userStatus(Status::regular) {}
+    void updateMsg(const Telegram::Message &msg) { last_msg = msg; last_msg_tp = msg.date; list_msg << msg; isNeedUpdate = true; };
 
     Telegram::User tg_user;
-    bool           is_banned { false };
+    bool           is_banned    { false };
     QDateTime      ban_tp;
     bool           isNeedUpdate { false };
+    bool           isNewUser    { false };
 
     enum class Role   { teacher, student };
     enum class Status { admin,   donater, regular } userStatus;
     struct settingsRole
     {
-        QString       schoolName;
+        uint32_t      schoolID;
         Role          role;
-        int           roleID;
+        uint32_t      roleID;
     } userRole;
 
     Telegram::Message        last_msg;
@@ -37,7 +38,12 @@ struct User
 struct Schedule
 {
     bool              isNeedUpdate { false };
-    uint32_t          scheduleID, classID, subjectID, teacherID, lessonID, weekDay, audienceNumber;
+    uint32_t          scheduleID, schoolID, classID, subjectID, teacherID, lessonID, weekDay, audienceNumber;
+};
+struct School
+{
+    uint32_t          schoolID;
+    QString           schoolName;
 };
 
 #endif // TYPES_H

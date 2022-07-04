@@ -4,11 +4,25 @@
 #include <QObject>
 #include <QMap>
 #include <QtConcurrent>
+#include <QSet>
 #include <QFutureSynchronizer>
 #include "Database.h"
 #include "Settings.h"
 
 #define CMD_START "/start"
+#define CMD_STUDENT "/student"
+#define CMD_TEACHER "/teacher"
+#define CMD_TODAY "/today"
+#define CMD_TOMORROW "/tomorrow"
+#define CMD_WEEK "/week"
+#define CMD_CHANGESCHOOL "/changeSchool"
+#define CMD_CHANGESETTINGS "/changeSettings"
+
+#define CMD_INSERT "/insertSchedule"
+#define CMD_UPDATEUSERS "/updateUsers"
+#define CMD_UPDATESCHEDULE "/updateSchedule"
+#define CMD_DELETEUSER "/deleteUser"
+#define CMD_DELETESCHEDULE "/deleteSchedule"
 
 class Controller : public QObject
 {
@@ -27,12 +41,21 @@ private:
     void load_db();
     void load_db_users();
     void load_db_schedule();
+    void load_table_school();
     void updateDataToUsers();
     void updateDataToSchedule();
     void insertUserToDb(const User &user);
     void insertScheduleToDb(const Schedule &schedule);
     void getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings);
     void getScheduleOnWeek (const User::settingsRole &settings);
+
+    void processingTheStudent();
+    void processingTheTeacher();
+    void processingTheToday();
+    void processingTheTomorrow();
+    void processingTheWeek();
+    void processingTheChangeSchool();
+    void processingTheChangeSettings();
 
     void handle_msg_guest(const User &user);
     void handle_msg_normal(const User &user);
@@ -44,8 +67,8 @@ private slots:
 
 private:
     QMap<user_id, User> m_users;
-    QMap<int, Schedule> m_schedule;
-    // TODO impl me m_other_data; // if need
+    QMap<uint32_t, Schedule> m_schedule;
+    QMap<uint32_t, School> m_school;
 
     Database            m_db_users;
     Database            m_db_schedule;
