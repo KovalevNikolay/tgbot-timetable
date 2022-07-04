@@ -24,7 +24,7 @@ User& Controller::find_or_create(const user_id id)
     {
         Telegram::User user(id);
         it = m_users.insert(id, user);
-        it->isNeedUpdate = true;
+        it->isNewUser= true;
         qInfo() << "User created " << user;
 
         User user_db(user);
@@ -41,63 +41,94 @@ void Controller::load_db()
 void Controller::load_db_users()
 {
     qInfo() << "Load database users";
-    m_db_users.connect_db("users.db"); // FIXME use returned value
+    auto res = m_db_users.connect_db("users.db"); // FIXME use returned value
+    if (res.isValid())
+    {
+    	qCritical() <<"users database connection error";
+    	return;
+    }
 
     Telegram::User user_from_db;
     User     user(user_from_db);
 
     for (auto &el : m_db_users.sql_request("SELECT * FROM users"))
     {
-       user.tg_user.id        = el.field("user_id").value().toUInt();
-       user.tg_user.firstname = el.field("firstName").value().toString();
-       user.tg_user.lastname  = el.field("lastName").value().toString();
-       user.tg_user.username  = el.field("userName").value().toString();
-       user.last_msg_tp = QDateTime::fromSecsSinceEpoch(el.field("last_msg_tp").value().toUInt());
-       user.is_banned   = el.field("is_banned").value().toBool();
-       user.ban_tp      = QDateTime::fromSecsSinceEpoch(el.field("ban_tp").value().toUInt());
-       //user.last_msg=m_db_users.sql_request("SELECT * FROM users")[i].field("last_msg").value().toString();
+       user.tg_user.id        = el.field("userID").value().toUInt();
+       user.userRole.schoolID = el.field("schoolID").value().toUInt();
+       user.userRole.roleID   = el.field("roleID").value().toUInt();
+       user.userRole.role     = static_cast<User::Role>(el.field("role").value().toUInt());
+       user.userStatus        = static_cast<User::Status>(el.field("userStatus").value().toUInt());
+       user.last_msg_tp       = QDateTime::fromSecsSinceEpoch(el.field("last_msg_tp").value().toUInt());
+       user.is_banned         = el.field("is_banned").value().toBool();
+       user.ban_tp            = QDateTime::fromSecsSinceEpoch(el.field("ban_tp").value().toUInt());
+       user.last_msg.string   = el.field("last_msg").value().toString();
 
        m_users.insert(user.tg_user.id, user);
     }
 }
 void Controller::load_db_schedule()
 {
-    qInfo() << "Load database school";
-    m_db_schedule.connect_db("schedule.db");
+    qInfo() << "Load database schedule";
+    auto res = m_db_schedule.connect_db("schedule.db");
+    if (res.isValid())
+    {
+        qCritical() <<"schedule database connection error";
+    	return;
+    }
 
     Schedule schedule;
 
     for (auto &el : m_db_schedule.sql_request("SELECT * FROM schedule"))
     {
-        schedule.scheduleID=el.field("ID").value().toInt();
-        schedule.classID=el.field("classID").value().toInt();
-        schedule.subjectID=el.field("subjectID").value().toInt();
-        schedule.teacherID=el.field("teacherID").value().toInt();
-        schedule.lessonID=el.field("lessonID").value().toInt();
-        schedule.weekDay=el.field("weekDay").value().toInt();
-        schedule.audienceNumber=el.field("audienceNumber").value().toInt();
+        schedule.scheduleID=el.field("ID").value().toUInt();
+        schedule.schoolID=el.field("schoolID").value().toUInt();
+        schedule.classID=el.field("classID").value().toUInt();
+        schedule.subjectID=el.field("subjectID").value().toUInt();
+        schedule.teacherID=el.field("teacherID").value().toUInt();
+        schedule.lessonID=el.field("lessonID").value().toUInt();
+        schedule.weekDay=el.field("weekDay").value().toUInt();
+        schedule.audienceNumber=el.field("audienceNumber").value().toUInt();
 
         m_schedule.insert(schedule.scheduleID, schedule);
+    }
+
+    load_table_school();
+}
+void Controller::load_table_school()
+{
+    qInfo() << "Load table school";
+    School school;
+
+    for (auto &el : m_db_schedule.sql_request("SELECT * FROM schools"))
+    {
+        school.schoolID=el.field("schoolID").value().toUInt();
+        school.schoolName=el.field("schoolName").value().toString();
+
+        m_school.insert(school.schoolID, school);
     }
 }
 void Controller::updateDataToUsers()
 {
     for (auto &el : m_users)
     {
+        if (el.isNewUser)
+        {
+            insertUserToDb(el);
+            el.isNewUser=false;
+        }
         if (el.isNeedUpdate)
         {
-            QString request = "UPDATE users"
-                              "SET userName = '"+el.tg_user.username+"', "
-                              "firstName = '"+el.tg_user.firstname+"', "
-                              "lastName = '"+el.tg_user.lastname+"', "
-                              "userStatus = "+static_cast<int>(el.userStatus)+", "
+            QString request = "UPDATE users "
+                              "SET "
+                              "userStatus = "+QString::number(static_cast<int>(el.userStatus))+", "
                               "is_banned = "+QString::number(el.is_banned)+", "
-                              "ban_tp = "+el.ban_tp.toSecsSinceEpoch()+", "
-                              "role = '"+static_cast<int>(el.userRole.role)+"', "
-                              "roleID = "+el.userRole.roleID+", "
-                              "last_msg_tp = "+el.last_msg_tp.toSecsSinceEpoch()+" "
-                              "last_msg = '"+el.last_msg.string+"' " //last_msg
-                              "WHERE user_id = "+el.tg_user.id+";";
+                              "ban_tp = "+QString::number(el.ban_tp.toSecsSinceEpoch())+", "
+                              "schoolID = "+QString::number(el.userRole.schoolID)+", "
+                              "role = "+QString::number(static_cast<int>(el.userRole.role))+", "
+                              "roleID = "+QString::number(el.userRole.roleID)+", "
+                              "last_msg_tp = "+QString::number(el.last_msg_tp.toSecsSinceEpoch())+", "
+                              "last_msg = '"+el.last_msg.string+"' "
+                              "WHERE userID = "+QString::number(el.tg_user.id)+";";
 
             m_db_users.sql_request(request);
             el.isNeedUpdate = false;
@@ -110,8 +141,9 @@ void Controller::updateDataToSchedule()
     {
         if (el.isNeedUpdate)
         {
-            QString request = "UPDATE schedule"
-                              "SET classID = "+QString::number(el.classID)+", "
+            QString request = "UPDATE schedule "
+                              "SET schoolID = "+QString::number(el.schoolID)+", "
+                              "classID = "+QString::number(el.classID)+", "
                               "subjectID = "+QString::number(el.subjectID)+", "
                               "teacherID = "+QString::number(el.teacherID)+", "
                               "lessonID = "+QString::number(el.lessonID)+", "
@@ -126,25 +158,24 @@ void Controller::updateDataToSchedule()
 }
 void Controller::insertUserToDb(const User &user)
 {
-    QString request="INSERT INTO users (userID, userName, firstName, lastName, userStatus, isBanned, banTp, role, roleID, lastMsgTp, lastMsg)"
+    QString request="INSERT INTO users (userID, userStatus, is_banned, ban_tp, schoolID, role, roleID, last_msg_tp, last_msg) "
                     "VALUES ("+QString::number(user.tg_user.id)+", "
-                              +user.tg_user.username+", "
-                              +user.tg_user.firstname+", "
-                              +user.tg_user.lastname+", "
-                              +static_cast<int>(user.userStatus)+", "
-                              +user.is_banned+", "
-                              +user.ban_tp.toSecsSinceEpoch()+", "
-                              +static_cast<int>(user.userRole.role)+", "
+                              +QString::number(static_cast<int>(user.userStatus))+", "
+                              +QString::number(user.is_banned)+", "
+                              +QString::number(user.ban_tp.toSecsSinceEpoch())+", "
+                              +QString::number(user.userRole.schoolID)+", "
+                              +QString::number(static_cast<int>(user.userRole.role))+", "
                               +QString::number(user.userRole.roleID)+", "
-                              +user.last_msg_tp.toSecsSinceEpoch()+", "
-                              +user.last_msg.string+");"; //last_msg
+                              +QString::number(user.last_msg_tp.toSecsSinceEpoch())+", '"
+                              +user.last_msg.string+"');";
 
     m_db_users.sql_request(request);
 }
 void Controller::insertScheduleToDb(const Schedule &schedule)
 {
-    QString request="INSERT INTO schedule (classID, subjectID, teacherID, lessonID, weekDay, audienceNumber)"
-                    "VALUES ("+QString::number(schedule.classID)+", "
+    QString request="INSERT INTO schedule (schoolID, classID, subjectID, teacherID, lessonID, weekDay, audienceNumber) "
+                    "VALUES ("+QString::number(schedule.schoolID)+", "
+                              +QString::number(schedule.classID)+", "
                               +QString::number(schedule.subjectID)+", "
                               +QString::number(schedule.teacherID)+", "
                               +QString::number(schedule.lessonID)+", "
@@ -160,13 +191,15 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsR
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
                 "FROM schedule "
+                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
                     "INNER JOIN classes ON schedule.classID = classes.classID "
                     "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
                     "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
                 "WHERE schedule.weekDay = "+QString::number(weekDayNumber)+" "
-                      "AND classes.className= '"+QString::number(settings.roleID)+"' "
+                    "AND classes.className = '"+QString::number(settings.roleID)+"' "
+                    "AND schools.schoolID = "+QString::number(settings.schoolID)+" "
                 "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
         m_db_schedule.sql_request(request);
@@ -175,13 +208,15 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User::settingsR
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNumber "
                 "FROM schedule "
+                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
                     "INNER JOIN classes ON schedule.classID = classes.classID "
                     "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
                     "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
                 "WHERE schedule.weekDay = "+QString::number(weekDayNumber)+" "
-                      "AND teachers.teacherID= "+QString::number(settings.roleID)+" "
+                    "AND teachers.teacherID = "+QString::number(settings.roleID)+" "
+                    "AND schools.schoolID = "+QString::number(settings.schoolID)+" "
                 "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
         m_db_schedule.sql_request(request);
@@ -194,26 +229,32 @@ void Controller::getScheduleOnWeek(const User::settingsRole &settings)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
                 "FROM schedule "
+                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
                     "INNER JOIN classes ON schedule.classID = classes.classID "
                     "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
                     "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
-                "WHERE classes.className= '"+QString::number(settings.roleID)+"' "
+                "WHERE classes.className = '"+QString::number(settings.roleID)+"' "
+                    "AND schools.schoolID = "+QString::number(settings.schoolID)+" "
                 "ORDER BY schedule.LessonID AND schedule.weekDay ";
+
         m_db_schedule.sql_request(request);
     }
     else if (settings.role == User::Role::teacher)
     {
         request="SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNumber "
                 "FROM schedule "
+                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
                     "INNER JOIN classes ON schedule.classID = classes.classID "
                     "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
                     "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
-                "WHERE teachers.teacherID= "+QString::number(settings.roleID)+" "
+                "WHERE teachers.teacherID = "+QString::number(settings.roleID)+" "
+                    "AND schools.schoolID = "+QString::number(settings.schoolID)+" "
                 "ORDER BY schedule.LessonID AND schedule.weekDay ";
+
         m_db_schedule.sql_request(request);
     }
 }
@@ -226,8 +267,7 @@ void Controller::handle_msg_guest(const User &user)
         {
             if(msg.string == CMD_START)
             {
-                m_bot->sendMessage(user.tg_user.id, "U new user or delete chat with bot"); // only test
-                // определить по полям user был такой челик или нет и в зависимости от этого высрать ответ
+                if (m_users.find(user.tg_user.id)==m_users.end())  insertUserToDb(user);
             } else
             {
                 m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
@@ -325,8 +365,8 @@ void Controller::handle_msg(const Telegram::Message msg)
 
     if(!user.is_banned)
     {
-        if(user.userStatus == User::Status::guest)       handle_msg_guest(user);
-        else if(user.userStatus == User::Status::normal) handle_msg_normal(user);
+        if(user.userStatus == User::Status::regular)       handle_msg_guest(user);
+        else if(user.userStatus == User::Status::donater) handle_msg_normal(user);
         else if(user.userStatus == User::Status::admin)  handle_msg_admin(user);
     } else qInfo() << "Banned " << user.tg_user << " send message";
 }
