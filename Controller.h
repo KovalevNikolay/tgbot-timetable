@@ -10,13 +10,20 @@
 #include "Settings.h"
 
 #define CMD_START "/start"
+#define CMD_SCHOOL "/school"
+#define CMD_SETSCHOOL "/setSchool"
 #define CMD_STUDENT "/student"
 #define CMD_TEACHER "/teacher"
+#define CMD_SETCLASS "/setClass"
+#define CMD_SETTEACHER "/setTeacher"
 #define CMD_TODAY "/today"
 #define CMD_TOMORROW "/tomorrow"
 #define CMD_WEEK "/week"
-#define CMD_CHANGESCHOOL "/changeSchool"
-#define CMD_CHANGESETTINGS "/changeSettings"
+#define CMD_SETTINGS "/Settings"
+#define CMD_NOTIFICATIONS "/notifications"
+#define CMD_PLUSVERSION "/plus"
+#define CMD_BACK "/back"
+#define CMD_RESETSETTINGS "/resetSettings" //==CMD_START
 
 #define CMD_INSERT "/insertSchedule"
 #define CMD_UPDATEUSERS "/updateUsers"
@@ -41,21 +48,23 @@ private:
     void load_db();
     void load_db_users();
     void load_db_schedule();
-    void load_table_school();
+    void load_list_school();
+    void load_list_classes();
+    void load_list_teachers();
+
     void updateDataToUsers();
     void updateDataToSchedule();
     void insertUserToDb(const User &user);
     void insertScheduleToDb(const Schedule &schedule);
-    void getScheduleOnDay(const int weekDayNumber, const User::settingsRole &settings);
-    void getScheduleOnWeek (const User::settingsRole &settings);
+    void getScheduleOnDay(const int weekDayNumber, const User &user);
+    void getScheduleOnWeek (const User &user);
 
-    void processingTheStudent();
-    void processingTheTeacher();
-    void processingTheToday();
-    void processingTheTomorrow();
-    void processingTheWeek();
-    void processingTheChangeSchool();
-    void processingTheChangeSettings();
+    void processingTheSchool(const User &user);
+    void processingTheStudent(const User &user);
+    void processingTheTeacher(const User &user);
+    void processingTheSetTeacher(const uint32_t &id, User user);
+    void processingTheSetClass(const uint32_t &id, User user);
+    void processingTheSetSchool(const uint32_t &id, User user);
 
     void handle_msg_guest(const User &user);
     void handle_msg_normal(const User &user);
@@ -66,9 +75,11 @@ private slots:
     void handle_msg(const Telegram::Message msg);
 
 private:
-    QMap<user_id, User> m_users;
+    QMap<user_id,  User>     m_users;
     QMap<uint32_t, Schedule> m_schedule;
-    QMap<uint32_t, School> m_school;
+    QMap<uint32_t, School>   m_school;
+    QMap<uint32_t, Classes>  m_classes;
+    QMap<uint32_t, Teacher>  m_teacher;
 
     Database            m_db_users;
     Database            m_db_schedule;

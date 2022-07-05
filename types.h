@@ -45,5 +45,16 @@ struct School
     uint32_t          schoolID;
     QString           schoolName;
 };
+struct Classes
+{
+    uint32_t          classID;
+    QString           className;
+
+};
+struct Teacher
+{
+    uint32_t          teacherID, schoolID;
+    QString           firstName, secondName, lastName;
+};
 
 #endif // TYPES_H
