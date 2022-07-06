@@ -64,6 +64,7 @@ void Controller::load_db_users()
        user.last_msg.string   = el.field("last_msg").value().toString();
 
        m_users.insert(user.tg_user.id, user);
+
     }
 }
 void Controller::load_db_schedule()
@@ -233,7 +234,16 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User &user)
                     "AND schools.schoolID = "+QString::number(user.userRole.schoolID)+" "
                   "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
-        m_db_schedule.sql_request(request);
+        for (auto &el : m_db_schedule.sql_request(request))
+        {
+            qDebug()<<"N Урока " + el.field("lessonID").value().toString();
+            qDebug()<<"Время Урока " + el.field("lessonTime").value().toString();
+            qDebug()<<"Предмет: " + el.field("SubjectName").value().toString();
+            qDebug()<<"Преподаватель: " + el.field("firstName").value().toString()+" "+el.field("secondName").value().toString()+" "+el.field("lastName").value().toString();
+            qDebug()<<"Кабинет: " + el.field("audienceNumber").value().toString();
+
+            //это нужно отправить юзеру.
+        }
     }
     else if (user.userRole.role == User::Role::teacher)
     {
@@ -250,7 +260,16 @@ void Controller::getScheduleOnDay(const int weekDayNumber, const User &user)
                     "AND schools.schoolID = "+QString::number(user.userRole.schoolID)+" "
                   "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
-        m_db_schedule.sql_request(request);
+        for (auto &el : m_db_schedule.sql_request(request))
+        {
+            qDebug()<<"N Урока " + el.field("lessonID").value().toString();
+            qDebug()<<"Время Урока " + el.field("lessonTime").value().toString();
+            qDebug()<<"Предмет: " + el.field("SubjectName").value().toString();
+            qDebug()<<"Класс: " + el.field("className").value().toString();
+            qDebug()<<"Кабинет: " + el.field("audienceNumber").value().toString();
+
+            //это нужно отправить юзеру.
+        }
     }
 }
 void Controller::getScheduleOnWeek(const User &user)
@@ -270,7 +289,6 @@ void Controller::getScheduleOnWeek(const User &user)
                     "AND schools.schoolID = "+QString::number(user.userRole.schoolID)+" "
                   "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
-        m_db_schedule.sql_request(request);
     }
     else if (user.userRole.role == User::Role::teacher)
     {
@@ -305,7 +323,7 @@ void Controller::processingTheTeacher(const User &user)
 {
     //m_teacher
     //отпрвить список учитилей, работающих в школе User'a
-    //user.userRole.schoolID == m_teacher[i].schoolID
+    //for () {if (user.userRole.schoolID == m_teacher[i].schoolID) ...}
     m_bot->sendMessage(user.tg_user.id, "list teachers");
 }
 void Controller::processingTheSetTeacher(const uint32_t &id, User user)
@@ -330,15 +348,15 @@ void Controller::handle_msg_guest(const User &user)
         case Telegram::Message::TextType:
         {
             if(msg.string == CMD_START) { if (m_users.find(user.tg_user.id) == m_users.end()) insertUserToDb(user); }
-            else if (msg.string == CMD_SCHOOL)    processingTheSchool(user);
-            else if (msg.string == CMD_SETSCHOOL) processingTheSetSchool(2, user); //2 is the id that is the argument to the command /setSchool 2
-            else if (msg.string == CMD_STUDENT)   processingTheStudent(user);
-            else if (msg.string == CMD_TEACHER)   processingTheTeacher(user);
-            else if (msg.string == CMD_SETCLASS)  processingTheSetClass(2, user); //2 is the id that is the argument to the command /setClass 2
-            else if (msg.string == CMD_SETCLASS)  processingTheSetTeacher(2, user); //2 is the id that is the argument to the command /setTeacher 2
-            else if (msg.string == CMD_TODAY)     getScheduleOnDay(QDate::currentDate().dayOfWeek(), user);
+            else if (msg.string == CMD_SCHOOL)    processingTheSchool(user); //добавить вывод результатов в сообщение user'у
+            else if (msg.string == CMD_SETSCHOOL) processingTheSetSchool(2, user); //2 - аргумент для команды /setSchool 2
+            else if (msg.string == CMD_STUDENT)   processingTheStudent(user); //добавить вывод результатов в сообщение user'у
+            else if (msg.string == CMD_TEACHER)   processingTheTeacher(user); //добавить вывод результатов в сообщение user'у
+            else if (msg.string == CMD_SETCLASS)  processingTheSetClass(2, user); //2 - аргумент для команды /setClass 2
+            else if (msg.string == CMD_SETCLASS)  processingTheSetTeacher(2, user); //2 - аргумент для команды /setTeacher 2
+            else if (msg.string == CMD_TODAY)     getScheduleOnDay(QDate::currentDate().dayOfWeek(), user);//добавить вывод результатов в сообщение user'у
             else if (msg.string == CMD_TOMORROW)  getScheduleOnDay(QDate::currentDate().dayOfWeek()+1, user);
-            else if (msg.string == CMD_WEEK)      getScheduleOnWeek(user);
+            else if (msg.string == CMD_WEEK)      getScheduleOnWeek(user); // пока что не трогай
             else if (msg.string == CMD_SETTINGS)
             {
 
@@ -360,7 +378,7 @@ void Controller::handle_msg_guest(const User &user)
 
             }
 //            {
-               m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
+//               m_bot->sendMessage(user.tg_user.id, user.last_msg.string + " last msg time: " + user.last_msg_tp.toString("dd.MM.yyyy hh:mm:ss"));
 //            }
             break;
         }
