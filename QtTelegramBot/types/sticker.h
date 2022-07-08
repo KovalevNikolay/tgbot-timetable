@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 #include "photosize.h"
 
 namespace Telegram {
