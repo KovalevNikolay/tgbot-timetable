@@ -58,7 +58,8 @@ private:
     void updateDataToSchedule();
     void insertUserToDb(const User &user);
     void insertScheduleToDb(const Schedule &schedule);
-    void getScheduleOnDay(const int weekDayNumber, const User &user);
+    void insertMsgToHistory(const User &user);
+    void getScheduleOnDay(const int dayOfWeekNumber, const User &user);
     void getScheduleOnWeek (const User &user);
 
     void processingTheSchool(const User &user);
