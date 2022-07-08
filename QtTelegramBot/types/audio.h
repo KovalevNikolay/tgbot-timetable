@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 
 namespace Telegram {
 
@@ -32,6 +33,30 @@ inline QDebug operator<< (QDebug dbg, const Audio &audio)
                                     .arg(audio.fileSize));
 
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Audio &audio)
+{
+    out                    <<
+           audio.fileId    <<
+           audio.duration  <<
+           audio.performer <<
+           audio.title     <<
+           audio.title     <<
+           audio.mimeType  <<
+           audio.fileSize;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Audio &audio)
+{
+    in                     >>
+           audio.fileId    >>
+           audio.duration  >>
+           audio.performer >>
+           audio.title     >>
+           audio.title     >>
+           audio.mimeType  >>
+           audio.fileSize;
+    return in;
 }
 }
 

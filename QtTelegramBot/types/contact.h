@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 
 namespace Telegram {
 
@@ -27,6 +28,24 @@ inline QDebug operator<< (QDebug dbg, const Contact &contact)
                                     .arg(contact.lastname)
                                     .arg(contact.userId));
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Contact &contact)
+{
+    out                        <<
+           contact.phoneNumber <<
+           contact.firstname   <<
+           contact.lastname    <<
+           contact.userId;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Contact &contact)
+{
+    in                         >>
+           contact.phoneNumber >>
+           contact.firstname   >>
+           contact.lastname    >>
+           contact.userId;
+    return in;
 }
 }
 

@@ -31,6 +31,26 @@ inline QDebug operator<< (QDebug dbg, const Sticker &sticker)
                                     .arg(sticker.fileSize));
     return dbg.maybeSpace();
 }
+inline QDataStream &operator << (QDataStream &out, const Sticker &sticker)
+{
+    out                   <<
+           sticker.fileId <<
+           sticker.width  <<
+           sticker.height <<
+           sticker.thumb  <<
+           sticker.fileSize;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Sticker &sticker)
+{
+    in                    >>
+           sticker.fileId >>
+           sticker.width  >>
+           sticker.height >>
+           sticker.thumb  >>
+           sticker.fileSize;
+    return in;
+}
 }
 
 #endif // STICKER_H

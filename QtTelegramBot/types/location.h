@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 
 namespace Telegram {
 
@@ -23,6 +24,20 @@ inline QDebug operator<< (QDebug dbg, const Location &location)
                                     .arg(location.longitude)
                                     .arg(location.latitude));
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Location &location)
+{
+    out                       <<
+           location.longitude <<
+           location.latitude;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Location &location)
+{
+    in                        >>
+           location.longitude >>
+           location.latitude;
+    return in;
 }
 }
 

@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDataStream>
 
 #include "audio.h"
 #include "document.h"
@@ -30,7 +31,7 @@ public:
     /**
      * @brief Telegram message events
      */
-    enum MessageType
+    enum MessageType : quint8
     {
         TextType, AudioType, DocumentType, PhotoType, StickerType, VideoType, VoiceType, ContactType,
         LocationType, NewChatParticipantType, LeftChatParticipantType, NewChatTitleType,
@@ -73,6 +74,52 @@ inline QDebug operator<< (QDebug dbg, const Message &message)
                                     .arg((message.type == Message::TextType)? message.string :""));
 
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Message &msg)
+{
+    out <<
+           msg.id <<
+           msg.date <<
+           msg.chat <<
+           msg.from <<
+           msg.forwardFrom <<
+           msg.forwardDate <<
+           //msg.replyToMessage << // FIXME SEG FAULT RECURSIV CALL
+           msg.type <<
+           msg.string <<
+           msg.user <<
+           msg.audio <<
+           msg.document <<
+           msg.photo <<
+           msg.sticker <<
+           msg.video <<
+           msg.voice <<
+           msg.contact <<
+           msg.location;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Message &msg)
+{
+    in            >>
+           msg.id >>
+           msg.date >>
+           msg.chat >>
+           msg.from >>
+           msg.forwardFrom >>
+           msg.forwardDate >>
+           //msg.replyToMessage >> // FIXME SEG FAULT RECURSIV CALL
+           msg.type >>
+           msg.string >>
+           msg.user >>
+           msg.audio >>
+           msg.document >>
+           msg.photo >>
+           msg.sticker >>
+           msg.video >>
+           msg.voice >>
+           msg.contact >>
+           msg.location;
+    return in;
 }
 }
 Q_DECLARE_METATYPE(Telegram::Message)

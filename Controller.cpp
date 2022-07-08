@@ -27,7 +27,7 @@ User& Controller::find_or_create(const user_id id)
         it->isNewUser= true;
         qInfo() << "User created " << user;
 
-        User user_db(user);
+        insertUserToDb(User(user));
 
         return *it;
     }
@@ -346,8 +346,8 @@ void Controller::handle_msg_guest(const User &user)
     {
         case Telegram::Message::TextType:
         {
-            if(msg.string == CMD_START) { if(m_users.find(user.tg_user.id) == m_users.end()) insertUserToDb(user); }
-            else if(msg.string == CMD_SCHOOL)    processingTheSchool(user); //добавить вывод результатов в сообщение user'у
+            //if(msg.string == CMD_START)
+            if(msg.string == CMD_SCHOOL)         processingTheSchool(user); //добавить вывод результатов в сообщение user'у
             else if(msg.string == CMD_SETSCHOOL) processingTheSetSchool(2, user); //2 - аргумент для команды /setSchool 2
             else if(msg.string == CMD_STUDENT)   processingTheStudent(user); //добавить вывод результатов в сообщение user'у
             else if(msg.string == CMD_TEACHER)   processingTheTeacher(user); //добавить вывод результатов в сообщение user'у
@@ -460,18 +460,32 @@ void Controller::handle_msg_admin(const User &user)
         default: break;
     }
 }
+QString Controller::msg_to_hex(const Telegram::Message &msg) const
+{
+    QByteArray  bytes;
+    QDataStream ds(&bytes, QIODevice::WriteOnly);
+    ds << msg;
+    return QString(bytes.toHex());
+}
+Telegram::Message Controller::msg_from_hex(const QString &hex) const
+{
+    QByteArray  bytes = QByteArray::fromHex(hex.toUtf8());
+    QDataStream ds(&bytes, QIODevice::ReadOnly);
+    Telegram::Message msg;
+    ds >> msg;
+    return msg;
+}
 void Controller::handle_msg(const Telegram::Message msg)
 {
     qDebug() << msg;
-
     auto &user = find_or_create(msg.from.id);
     user.updateMsg(msg);
 
     if(!user.is_banned)
     {
-        if(user.userStatus == User::Status::regular)       handle_msg_guest(user);
+        if(user.userStatus == User::Status::regular)      handle_msg_guest(user);
         else if(user.userStatus == User::Status::donater) handle_msg_normal(user);
-        else if(user.userStatus == User::Status::admin)    handle_msg_admin(user);
+        else if(user.userStatus == User::Status::admin)   handle_msg_admin(user);
     } else qInfo() << "Banned " << user.tg_user << " send message";
 }
 void Controller::update_bot_info()

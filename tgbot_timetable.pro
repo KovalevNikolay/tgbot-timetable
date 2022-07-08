@@ -10,12 +10,14 @@ QMAKE_CXXFLAGS += -O3 -march=native -finline-functions -funswitch-loops
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 ROOT      = $$PWD
 QT_TG_BOT = $$ROOT/QtTelegramBot
-IMGS  = $$ROOT/imgs
-ICONS = $$IMGS/icons
-message(Root path: $$ROOT)
+IMGS      = $$ROOT/imgs
+ICONS     = $$IMGS/icons
+TESTS     = $$ROOT/tests
+message(Root path:       $$ROOT)
 message(TG bot lib path: $$QT_TG_BOT)
-message(Imgs path: $$IMGS)
-message(Icons path: $$ICONS)
+message(Imgs path:       $$IMGS)
+message(Icons path:      $$ICONS)
+message(Icons tests:     $$TESTS)
 
 include($$QT_TG_BOT/QtTelegramBot.pri)
 

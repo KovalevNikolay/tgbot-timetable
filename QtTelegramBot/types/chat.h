@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 
 namespace Telegram {
 
@@ -13,7 +14,8 @@ public:
     Chat() {}
     Chat(QJsonObject chat);
 
-    enum ChatType {
+    enum ChatType : quint8
+    {
         Private,
         Group,
         Channel
@@ -37,6 +39,28 @@ inline QDebug operator<< (QDebug dbg, const Chat &chat)
                                     .arg(chat.firstname)
                                     .arg(chat.lastname));
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Chat &chat)
+{
+    out <<
+           chat.id        <<
+           chat.type      <<
+           chat.title     <<
+           chat.username  <<
+           chat.firstname <<
+           chat.lastname;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Chat &chat)
+{
+    in >>
+           chat.id        >>
+           chat.type      >>
+           chat.title     >>
+           chat.username  >>
+           chat.firstname >>
+           chat.lastname;
+    return in;
 }
 }
 

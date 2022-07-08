@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QString>
 #include <QJsonObject>
+#include <QDataStream>
 #include "photosize.h"
 
 namespace Telegram {
@@ -30,6 +31,26 @@ inline QDebug operator<< (QDebug dbg, const Document &document)
                                     .arg(document.mimeType)
                                     .arg(document.fileSize));
     return dbg.maybeSpace();
+}
+inline QDataStream &operator << (QDataStream &out, const Document &document)
+{
+    out                      <<
+           document.fileId   <<
+           document.thumb    <<
+           document.fileName <<
+           document.mimeType <<
+           document.fileSize;
+    return out;
+}
+inline QDataStream &operator >> (QDataStream &in, Document &document)
+{
+    in                       >>
+           document.fileId   >>
+           document.thumb    >>
+           document.fileName >>
+           document.mimeType >>
+           document.fileSize;
+    return in;
 }
 }
 
