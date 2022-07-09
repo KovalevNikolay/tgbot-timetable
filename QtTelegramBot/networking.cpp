@@ -81,6 +81,8 @@ QByteArray Networking::request(QString endpoint, ParameterList params, Networkin
 
     QByteArray ret = reply->readAll();
     delete reply;
+
+    qDebug() << "Ret: " << ret;
     return ret;
 }
 

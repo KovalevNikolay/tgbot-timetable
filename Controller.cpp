@@ -322,13 +322,20 @@ void Controller::processingTheSchool(const User &user)
 {
     //m_school
     //отправить список школ (schoolID, schoolName)
-    m_bot->sendMessage(user.tg_user.id, "list schools");
+
+    Telegram::InlineKeyboardButtons btns;
+    for(const auto &el : qAsConst(m_school)) btns << Telegram::InlineKeyboardButton(el.schoolName, "", "callback school " + QString::number(el.schoolID));
+
+    m_bot->sendMessage(user.tg_user.id, "Select your school:", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
 void Controller::processingTheStudent(const User &user)
 {
     //m_classes
     //отправить список классов (classID, className)
-    m_bot->sendMessage(user.tg_user.id, "list classes");
+    Telegram::InlineKeyboardButtons btns;
+    for(const auto &el : qAsConst(m_classes)) btns << Telegram::InlineKeyboardButton(el.className, "", "callback class " + QString::number(el.classID));
+
+    m_bot->sendMessage(user.tg_user.id, "Select your class:", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
 void Controller::processingTheTeacher(const User &user)
 {
@@ -493,6 +500,14 @@ void Controller::handle_msg(const Telegram::Message msg)
     auto &user = find_or_create(msg.from.id);
     user.updateMsg(msg);
     insertMsgToHistory(user);
+
+    // ONLY FOR DEBUG  REMOVE ME LATER
+    if(msg.type == Telegram::Message::TextType) processingTheStudent(user);
+    if((msg.type == 255))
+    {
+        qDebug() << "255: " << msg.string;
+    }
+    // ONLY FOR DEBUG  REMOVE ME LATER
 
     if(!user.is_banned)
     {
