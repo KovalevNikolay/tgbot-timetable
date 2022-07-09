@@ -83,7 +83,7 @@ public:
             keyboardButtons.append(array);
         }
         o.insert("inline_keyboard", keyboardButtons);
-        qDebug() << o;
+        qDebug() << "InlineKeyboardMarkup serialize: " << o;
         return serializeJson(o);
     }
 };

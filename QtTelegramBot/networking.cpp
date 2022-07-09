@@ -47,6 +47,7 @@ QByteArray Networking::request(QString endpoint, ParameterList params, Networkin
     {
         req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
         reply = m_nam->post(req, parameterListToString(params));
+        qDebug() << "Request: " << req.url() << parameterListToString(params);
     } else if(method == UPLOAD)
     {
         QByteArray boundary = generateMultipartBoundary(params);
@@ -73,6 +74,7 @@ QByteArray Networking::request(QString endpoint, ParameterList params, Networkin
     if(reply->error() != QNetworkReply::NoError)
     {
         qCritical("%s", qPrintable(QString("[%1] %2").arg(reply->error()).arg(reply->errorString())));
+        qCritical() << "Reply text: " << reply->readAll();
         delete reply;
         return QByteArray();
     }
