@@ -242,17 +242,17 @@ void Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
                   "WHERE schedule.weekDay = "   + QString::number(dayOfWeekNumber)        + " "
-                    "AND classes.className = '" + QString::number(user.userRole.roleID)   + "' "
+                    "AND classes.classID = " + QString::number(user.userRole.roleID)      + " "
                     "AND schools.schoolID = "   + QString::number(user.userRole.schoolID) + " "
                   "ORDER BY schedule.LessonID AND schedule.weekDay ";
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            qDebug()<<"N Урока "        + el.field("lessonID").value().toString();
-            qDebug()<<"Время Урока "    + el.field("lessonTime").value().toString();
-            qDebug()<<"Предмет: "       + el.field("SubjectName").value().toString();
-            qDebug()<<"Преподаватель: " + el.field("firstName").value().toString()+" "+el.field("secondName").value().toString()+" "+el.field("lastName").value().toString();
-            qDebug()<<"Кабинет: "       + el.field("audienceNumber").value().toString();
+            qDebug() << el.field("lessonID").value().toString() + " урок";
+            qDebug() << "Время Урока: "    + el.field("lessonTime").value().toString();
+            qDebug() << "Предмет: "        + el.field("SubjectName").value().toString();
+            qDebug() << "Преподаватель: "  + el.field("firstName").value().toString()+" "+el.field("secondName").value().toString()+" "+el.field("lastName").value().toString();
+            qDebug() << "Кабинет: "        + el.field("audienceNumber").value().toString();
 
             //это нужно отправить юзеру.
         }
@@ -274,11 +274,11 @@ void Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            qDebug()<<"N Урока "     + el.field("lessonID").value().toString();
-            qDebug()<<"Время Урока " + el.field("lessonTime").value().toString();
-            qDebug()<<"Предмет: "    + el.field("SubjectName").value().toString();
-            qDebug()<<"Класс: "      + el.field("className").value().toString();
-            qDebug()<<"Кабинет: "    + el.field("audienceNumber").value().toString();
+            qDebug() << el.field("lessonID").value().toString() + " урок";
+            qDebug() << "Время Урока: " + el.field("lessonTime").value().toString();
+            qDebug() << "Предмет: "     + el.field("SubjectName").value().toString();
+            qDebug() << "Класс: "       + el.field("className").value().toString();
+            qDebug() << "Кабинет: "     + el.field("audienceNumber").value().toString();
 
             //это нужно отправить юзеру.
         }
@@ -297,7 +297,7 @@ void Controller::getScheduleOnWeek(const User &user)
                     "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
                     "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
                     "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
-                  "WHERE classes.className = '" + QString::number(user.userRole.roleID) + "' "
+                  "WHERE classes.classID = "  + QString::number(user.userRole.roleID)   + " "
                     "AND schools.schoolID = " + QString::number(user.userRole.schoolID) + " "
                   "ORDER BY schedule.LessonID AND schedule.weekDay ";
     }
@@ -320,9 +320,6 @@ void Controller::getScheduleOnWeek(const User &user)
 }
 void Controller::processingTheSchool(const User &user)
 {
-    //m_school
-    //отправить список школ (schoolID, schoolName)
-
     Telegram::InlineKeyboardButtons btns;
     for(const auto &el : qAsConst(m_school)) btns << Telegram::InlineKeyboardButton(el.schoolName, "", "callback school " + QString::number(el.schoolID));
 
@@ -330,8 +327,6 @@ void Controller::processingTheSchool(const User &user)
 }
 void Controller::processingTheStudent(const User &user)
 {
-    //m_classes
-    //отправить список классов (classID, className)
     Telegram::InlineKeyboardButtons btns;
     for(const auto &el : qAsConst(m_classes)) btns << Telegram::InlineKeyboardButton(el.className, "", "callback class " + QString::number(el.classID));
 
@@ -339,10 +334,10 @@ void Controller::processingTheStudent(const User &user)
 }
 void Controller::processingTheTeacher(const User &user)
 {
-    //m_teacher
-    //отпрвить список учитилей, работающих в школе User'a
-    //for () {if (user.userRole.schoolID == m_teacher[i].schoolID) ...}
-    m_bot->sendMessage(user.tg_user.id, "list teachers");
+    Telegram::InlineKeyboardButtons btns;
+    for (const auto &el :qAsConst(m_teacher)) if (user.userRole.schoolID == el.schoolID) btns << Telegram::InlineKeyboardButton(el.firstName + " " +el.secondName + " " + el.lastName, "", "callback class " +QString::number(el.teacherID));
+
+    m_bot->sendMessage(user.tg_user.id, "Select your teacher:", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
 void Controller::processingTheSetTeacher(const uint32_t &id, User user)
 {
