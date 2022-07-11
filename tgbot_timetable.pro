@@ -3,7 +3,7 @@ QT       += core gui sql concurrent
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 message(Qt kit version $$QT_VERSION)
 
-CONFIG += c++17
+CONFIG += c++20
 QMAKE_CXXFLAGS += -O3 -march=native -finline-functions -funswitch-loops
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
