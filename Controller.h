@@ -8,6 +8,8 @@
 #include <QFutureSynchronizer>
 #include <QByteArray>
 #include <QDataStream>
+#include <QString>
+#include <QStringRef>
 #include "Database.h"
 #include "Settings.h"
 
@@ -77,7 +79,6 @@ private:
     Telegram::Message msg_from_hex(const QString &hex)         const;
 
 private slots:
-    void handle_msg(const Telegram::Message msg);
     void handle_update(const Telegram::Update upd);
 
 private:

@@ -10,7 +10,6 @@ Controller::Controller(QObject *parent)
     load_db();
 
     m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
-    QObject::connect(m_bot, &Telegram::Bot::message, this,  &Controller::handle_msg);
     QObject::connect(m_bot, &Telegram::Bot::update,  this,  &Controller::handle_update);
 }
 Controller::~Controller()
@@ -337,7 +336,7 @@ void Controller::processingTheStudent(const User &user)
 void Controller::processingTheTeacher(const User &user)
 {
     Telegram::InlineKeyboardButtons btns;
-    for (const auto &el :qAsConst(m_teacher)) if (user.userRole.schoolID == el.schoolID) btns << Telegram::InlineKeyboardButton(el.firstName + " " +el.secondName + " " + el.lastName, "", "callback class " +QString::number(el.teacherID));
+    for (const auto &el :qAsConst(m_teacher)) if (user.userRole.schoolID == el.schoolID) btns << Telegram::InlineKeyboardButton(el.firstName + " " +el.secondName + " " + el.lastName, "", "callback teacher " +QString::number(el.teacherID));
 
     m_bot->sendMessage(user.tg_user.id, "Select your teacher:", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
@@ -491,8 +490,9 @@ Telegram::Message Controller::msg_from_hex(const QString &hex) const
     ds >> msg;
     return msg;
 }
-void Controller::handle_msg(const Telegram::Message msg)
+void Controller::handle_update(const Telegram::Update upd)
 {
+    auto &msg = upd.message;
     qDebug() << msg;
     auto &user = find_or_create(msg.from.id);
     user.updateMsg(msg);
@@ -508,14 +508,32 @@ void Controller::handle_msg(const Telegram::Message msg)
         else if(user.userStatus == User::Status::donater) handle_msg_normal(user);
         else if(user.userStatus == User::Status::admin)   handle_msg_admin(user);
     } else qInfo() << "Banned " << user.tg_user << " send message";
-}
-void Controller::handle_update(const Telegram::Update upd)
-{
+
+    //CALLBACK
     const auto cb = upd.callbackquery;
     if(!cb.isEmpty())
     {
         qDebug() << cb;
         m_bot->answerCallbackQuery(cb.id);
+        if(cb.data.indexOf("callback school") != -1)
+        {
+            constexpr auto substr_size = sizeof("callback class") - 1;
+            QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
+            ref = ref.trimmed();
+
+            qDebug() << "cb ref " << ref;
+
+        } else if(cb.data.indexOf("callback class") != -1)
+        {
+            constexpr auto substr_size = sizeof("callback class") - 1;
+            QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
+            ref = ref.trimmed();
+
+            qDebug() << "cb ref " << substr_size << " " << ref;
+        } else if(cb.data.indexOf("callback teacher") != -1)
+        {
+
+        } else qWarning() << "Unknown callback: " << cb.data;
     }
 }
 void Controller::update_bot_info()
