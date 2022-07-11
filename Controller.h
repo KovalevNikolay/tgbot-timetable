@@ -78,6 +78,7 @@ private:
 
 private slots:
     void handle_msg(const Telegram::Message msg);
+    void handle_update(const Telegram::Update upd);
 
 private:
     QMap<user_id,  User>     m_users;

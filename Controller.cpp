@@ -4,12 +4,14 @@ Controller::Controller(QObject *parent)
     : QObject{parent}
 {
     qRegisterMetaType<Telegram::Message>("Message");
+    qRegisterMetaType<Telegram::Update>("Update");
 
     m_settings = new Settings(m_db_users);
     load_db();
 
     m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
     QObject::connect(m_bot, &Telegram::Bot::message, this,  &Controller::handle_msg);
+    QObject::connect(m_bot, &Telegram::Bot::update,  this,  &Controller::handle_update);
 }
 Controller::~Controller()
 {
@@ -498,10 +500,6 @@ void Controller::handle_msg(const Telegram::Message msg)
 
     // ONLY FOR DEBUG  REMOVE ME LATER
     if(msg.type == Telegram::Message::TextType) processingTheStudent(user);
-    if((msg.type == 255))
-    {
-        qDebug() << "255: " << msg.string;
-    }
     // ONLY FOR DEBUG  REMOVE ME LATER
 
     if(!user.is_banned)
@@ -510,6 +508,15 @@ void Controller::handle_msg(const Telegram::Message msg)
         else if(user.userStatus == User::Status::donater) handle_msg_normal(user);
         else if(user.userStatus == User::Status::admin)   handle_msg_admin(user);
     } else qInfo() << "Banned " << user.tg_user << " send message";
+}
+void Controller::handle_update(const Telegram::Update upd)
+{
+    const auto cb = upd.callbackquery;
+    if(!cb.isEmpty())
+    {
+        qDebug() << cb;
+        m_bot->answerCallbackQuery(cb.id);
+    }
 }
 void Controller::update_bot_info()
 {

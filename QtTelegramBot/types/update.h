@@ -27,5 +27,5 @@ inline QDebug operator<< (QDebug dbg, const Update &update)
     return dbg.maybeSpace();
 }
 }
-
+Q_DECLARE_METATYPE(Telegram::Update)
 #endif // UPDATE_H
