@@ -249,7 +249,7 @@ QString Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            textMessage += el.field("lessonID").value().toString() + " урок"
+            textMessage += el.field("lessonID").value().toString()                    + " урок"
                     "\nВремя урока: "    + el.field("lessonTime").value().toString()  +
                     "\nПредмет: "        + el.field("SubjectName").value().toString() +
                     "\nПреподаватель: "  + el.field("firstName").value().toString()   +
@@ -275,11 +275,11 @@ QString Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            textMessage += el.field("lessonID").value().toString() + " урок"
-                    "\nВремя урока: " + el.field("lessonTime").value().toString()  +
-                    "\nПредмет: "     + el.field("SubjectName").value().toString() +
-                    "\nКласс: "       + el.field("className").value().toString()   +
-                    "\nКабинет: "     + el.field("audienceNumber").value().toString();
+            textMessage += el.field("lessonID").value().toString()                    + " урок"
+                    "\nВремя урока: " + el.field("lessonTime").value().toString()     +
+                    "\nПредмет: "     + el.field("SubjectName").value().toString()    +
+                    "\nКласс: "       + el.field("className").value().toString()      +
+                    "\nКабинет: "     + el.field("audienceNumber").value().toString() + "\n\n";
         }
     }
 
