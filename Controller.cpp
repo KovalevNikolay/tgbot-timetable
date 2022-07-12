@@ -229,9 +229,9 @@ void Controller::insertMsgToHistory(const User &user)
                       "VALUES ("+QString::number(user.tg_user.id)+", '"+msg_to_hex(user.last_msg)+"');";
     m_db_users.sql_request(request);
 }
-void Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
+QString Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
 {
-    QString request;
+    QString request="", textMessage="";
     if(user.userRole.role == User::Role::student)
     {
         request = "SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
@@ -249,13 +249,13 @@ void Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            qDebug() << el.field("lessonID").value().toString() + " урок";
-            qDebug() << "Время Урока: "    + el.field("lessonTime").value().toString();
-            qDebug() << "Предмет: "        + el.field("SubjectName").value().toString();
-            qDebug() << "Преподаватель: "  + el.field("firstName").value().toString()+" "+el.field("secondName").value().toString()+" "+el.field("lastName").value().toString();
-            qDebug() << "Кабинет: "        + el.field("audienceNumber").value().toString();
-
-            //это нужно отправить юзеру.
+            textMessage += el.field("lessonID").value().toString() + " урок"
+                    "\nВремя урока: "    + el.field("lessonTime").value().toString()  +
+                    "\nПредмет: "        + el.field("SubjectName").value().toString() +
+                    "\nПреподаватель: "  + el.field("firstName").value().toString()   +
+                    " " +el.field("secondName").value().toString()                    +
+                    " " +el.field("lastName").value().toString()                      +
+                    "\nКабинет: "        + el.field("audienceNumber").value().toString()+"\n\n";
         }
     }
     else if(user.userRole.role == User::Role::teacher)
@@ -275,49 +275,33 @@ void Controller::getScheduleOnDay(const int dayOfWeekNumber, const User &user)
 
         for(auto &el : m_db_schedule.sql_request(request))
         {
-            qDebug() << el.field("lessonID").value().toString() + " урок";
-            qDebug() << "Время Урока: " + el.field("lessonTime").value().toString();
-            qDebug() << "Предмет: "     + el.field("SubjectName").value().toString();
-            qDebug() << "Класс: "       + el.field("className").value().toString();
-            qDebug() << "Кабинет: "     + el.field("audienceNumber").value().toString();
-
-            //это нужно отправить юзеру.
+            textMessage += el.field("lessonID").value().toString() + " урок"
+                    "\nВремя урока: " + el.field("lessonTime").value().toString()  +
+                    "\nПредмет: "     + el.field("SubjectName").value().toString() +
+                    "\nКласс: "       + el.field("className").value().toString()   +
+                    "\nКабинет: "     + el.field("audienceNumber").value().toString();
         }
     }
-}
-void Controller::getScheduleOnWeek(const User &user)
-{
-    QString request;
-    if (user.userRole.role == User::Role::student)
-    {
-        request = "SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, teachers.FirstName, teachers.SecondName, teachers.LastName, schedule.audienceNumber "
-                  "FROM schedule "
-                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
-                    "INNER JOIN classes ON schedule.classID = classes.classID "
-                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
-                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
-                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
-                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
-                  "WHERE classes.classID = "  + QString::number(user.userRole.roleID)   + " "
-                    "AND schools.schoolID = " + QString::number(user.userRole.schoolID) + " "
-                  "ORDER BY schedule.LessonID AND schedule.weekDay ";
-    }
-    else if (user.userRole.role == User::Role::teacher)
-    {
-        request = "SELECT schedule.lessonID, Lessons.LessonTime, subjects.SubjectName, classes.className, schedule.audienceNumber "
-                  "FROM schedule "
-                    "INNER JOIN schools ON schedule.schoolID = schools.schoolID "
-                    "INNER JOIN classes ON schedule.classID = classes.classID "
-                    "INNER JOIN subjects ON schedule.subjectID = subjects.subjectID "
-                    "INNER JOIN teachers ON schedule.teacherID = teachers.teacherID "
-                    "INNER JOIN calendar ON schedule.weekDay = calendar.weekDay "
-                    "INNER JOIN lessons ON schedule.lessonID = lessons.lessonID "
-                  "WHERE teachers.teacherID = " + QString::number(user.userRole.roleID) + " "
-                    "AND schools.schoolID = " + QString::number(user.userRole.schoolID) + " "
-                  "ORDER BY schedule.LessonID AND schedule.weekDay ";
-    }
 
-    m_db_schedule.sql_request(request);
+    return textMessage;
+}
+QString Controller::getScheduleOnWeek(const User &user)
+{
+    QString textMessage="";
+    for (int i=1; i<7; i++)
+        if (getScheduleOnDay(i, user)!="")
+            textMessage+=QDate::longDayName(i, QDate::StandaloneFormat)+"\n\n"+getScheduleOnDay(i, user)+"***********\n\n";
+
+    return textMessage;
+}
+void Controller::studentOrTeacher(const User &user)
+{
+    Telegram::InlineKeyboardButtons btns;
+    btns << Telegram::InlineKeyboardButton("Student", "", "callback choice " + QString::number(0));
+    btns << Telegram::InlineKeyboardButton("Teacher", "", "callback choice " + QString::number(1));
+
+    m_bot->sendMessage(user.tg_user.id, "Are you a student or teacher?", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
+
 }
 void Controller::processingTheSchool(const User &user)
 {
@@ -340,19 +324,29 @@ void Controller::processingTheTeacher(const User &user)
 
     m_bot->sendMessage(user.tg_user.id, "Select your teacher:", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
-void Controller::processingTheSetTeacher(const uint32_t &id, User user)
+void Controller::setTeacher(const uint32_t &id, User &user)
 {
     user.userRole.role   = User::Role::teacher;
     user.userRole.roleID = id;
 }
-void Controller::processingTheSetClass(const uint32_t &id, User user)
+void Controller::setClass(const uint32_t &id, User &user)
 {
     user.userRole.role   = User::Role::student;
     user.userRole.roleID = id;
 }
-void Controller::processingTheSetSchool(const uint32_t &id, User user)
+void Controller::setSchool(const uint32_t &id, User &user)
 {
     user.userRole.schoolID = id;
+}
+void Controller::functionalMenu(const User &user)
+{
+    Telegram::InlineKeyboardButtons btns;
+    btns << Telegram::InlineKeyboardButton("Today", "", "callback menu " + QString::number(1));
+    btns << Telegram::InlineKeyboardButton("Tomorrow", "", "callback menu " + QString::number(2));
+    btns << Telegram::InlineKeyboardButton("A week", "", "callback menu " + QString::number(3));
+    btns << Telegram::InlineKeyboardButton("Reset settings", "", "callback menu " + QString::number(4));
+
+    m_bot->sendMessage(user.tg_user.id, "Menu", false, false, -1, Telegram::InlineKeyboardMarkup(btns));
 }
 void Controller::handle_msg_guest(const User &user)
 {
@@ -361,14 +355,8 @@ void Controller::handle_msg_guest(const User &user)
     {
         case Telegram::Message::TextType:
         {
-            //if(msg.string == CMD_START)
-            if(msg.string == CMD_SCHOOL)         processingTheSchool(user); //добавить вывод результатов в сообщение user'у
-            else if(msg.string == CMD_SETSCHOOL) processingTheSetSchool(2, user); //2 - аргумент для команды /setSchool 2
-            else if(msg.string == CMD_STUDENT)   processingTheStudent(user); //добавить вывод результатов в сообщение user'у
-            else if(msg.string == CMD_TEACHER)   processingTheTeacher(user); //добавить вывод результатов в сообщение user'у
-            else if(msg.string == CMD_SETCLASS)  processingTheSetClass(2, user); //2 - аргумент для команды /setClass 2
-            else if(msg.string == CMD_SETCLASS)  processingTheSetTeacher(2, user); //2 - аргумент для команды /setTeacher 2
-            else if(msg.string == CMD_TODAY)     getScheduleOnDay(QDate::currentDate().dayOfWeek(), user);//добавить вывод результатов в сообщение user'у
+            if(msg.string == CMD_START)          processingTheSchool(user);
+            else if(msg.string == CMD_TODAY)     getScheduleOnDay(QDate::currentDate().dayOfWeek(), user);
             else if(msg.string == CMD_TOMORROW)  getScheduleOnDay(QDate::currentDate().dayOfWeek()+1, user);
             else if(msg.string == CMD_WEEK)      getScheduleOnWeek(user); // пока что не трогать
             else if(msg.string == CMD_SETTINGS)
@@ -492,15 +480,15 @@ Telegram::Message Controller::msg_from_hex(const QString &hex) const
 }
 void Controller::handle_update(const Telegram::Update upd)
 {
-    auto &msg = upd.message;
+    if(!(upd.message.id && upd.callbackquery.message.id)) qCritical() << "no way wtf";
+    auto msg = (upd.message.id)?upd.message:(upd.callbackquery.message);
     qDebug() << msg;
-    auto &user = find_or_create(msg.from.id);
+    auto &user = (msg.from.id)?find_or_create(msg.from.id):find_or_create(upd.callbackquery.from.id);
+    qDebug() << "CB ID" << upd.callbackquery.from.id;
+    qDebug() << "USER ID" << user.tg_user.id;
+
     user.updateMsg(msg);
     insertMsgToHistory(user);
-
-    // ONLY FOR DEBUG  REMOVE ME LATER
-    if(msg.type == Telegram::Message::TextType) processingTheStudent(user);
-    // ONLY FOR DEBUG  REMOVE ME LATER
 
     if(!user.is_banned)
     {
@@ -517,23 +505,68 @@ void Controller::handle_update(const Telegram::Update upd)
         m_bot->answerCallbackQuery(cb.id);
         if(cb.data.indexOf("callback school") != -1)
         {
-            constexpr auto substr_size = sizeof("callback class") - 1;
+            constexpr auto substr_size = sizeof("callback school") - 1;
             QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
             ref = ref.trimmed();
+            setSchool(ref.toUInt(), user);
 
-            qDebug() << "cb ref " << ref;
+            studentOrTeacher(user);
+
+        } else if (cb.data.indexOf("callback choice") != -1)
+        {
+            constexpr auto substr_size = sizeof("callback choice") - 1;
+            QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
+            if (ref.trimmed().toInt()) processingTheTeacher(user);
+            else                       processingTheStudent(user);
 
         } else if(cb.data.indexOf("callback class") != -1)
         {
             constexpr auto substr_size = sizeof("callback class") - 1;
             QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
             ref = ref.trimmed();
+            setClass(ref.toUInt(), user);
+            functionalMenu(user);
 
-            qDebug() << "cb ref " << substr_size << " " << ref;
         } else if(cb.data.indexOf("callback teacher") != -1)
         {
+            constexpr auto substr_size = sizeof("callback teacher") - 1;
+            QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
+            ref = ref.trimmed();
+            setTeacher(ref.toUInt(), user);
+            functionalMenu(user);
 
-        } else qWarning() << "Unknown callback: " << cb.data;
+        } else if (cb.data.indexOf("callback menu") != -1)
+        {
+            constexpr auto substr_size = sizeof("callback menu") - 1;
+            QStringRef ref(&cb.data, substr_size, cb.data.size() - substr_size);
+            switch(ref.trimmed().toUInt())
+            {
+                case 1:
+                {
+                    m_bot->sendMessage(user.tg_user.id, getScheduleOnDay(QDate::currentDate().dayOfWeek(), user));
+                    functionalMenu(user);
+                    break;
+                }
+                case 2:
+                {
+                    m_bot->sendMessage(user.tg_user.id, getScheduleOnDay(QDate::currentDate().dayOfWeek()+1, user));
+                    functionalMenu(user);
+                    break;
+                }
+                case 3:
+                {
+                    m_bot->sendMessage(user.tg_user.id, getScheduleOnWeek(user));
+                    functionalMenu(user);
+                    break;
+                }
+                case 4:
+                {
+                    processingTheSchool(user);
+                    break;
+                }
+            }
+        }
+        else qWarning() << "Unknown callback: " << cb.data;
     }
 }
 void Controller::update_bot_info()

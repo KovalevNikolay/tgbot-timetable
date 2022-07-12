@@ -14,12 +14,6 @@
 #include "Settings.h"
 
 #define CMD_START         "/start"
-#define CMD_SCHOOL        "/school"
-#define CMD_SETSCHOOL     "/setSchool"
-#define CMD_STUDENT       "/student"
-#define CMD_TEACHER       "/teacher"
-#define CMD_SETCLASS      "/setClass"
-#define CMD_SETTEACHER    "/setTeacher"
 #define CMD_TODAY         "/today"
 #define CMD_TOMORROW      "/tomorrow"
 #define CMD_WEEK          "/week"
@@ -61,15 +55,18 @@ private:
     void insertUserToDb(const User &user);
     void insertScheduleToDb(const Schedule &schedule);
     void insertMsgToHistory(const User &user);
-    void getScheduleOnDay(const int dayOfWeekNumber, const User &user);
-    void getScheduleOnWeek (const User &user);
 
+    QString getScheduleOnDay(const int dayOfWeekNumber, const User &user);
+    QString getScheduleOnWeek (const User &user);
+
+    void studentOrTeacher (const User &user);
     void processingTheSchool(const User &user);
     void processingTheStudent(const User &user);
     void processingTheTeacher(const User &user);
-    void processingTheSetTeacher(const uint32_t &id, User user);
-    void processingTheSetClass(const uint32_t &id, User user);
-    void processingTheSetSchool(const uint32_t &id, User user);
+    void setTeacher(const uint32_t &id, User &user);
+    void setClass(const uint32_t &id, User &user);
+    void setSchool(const uint32_t &id, User &user);
+    void functionalMenu(const User &user);
 
     void handle_msg_guest(const User &user);
     void handle_msg_normal(const User &user);
