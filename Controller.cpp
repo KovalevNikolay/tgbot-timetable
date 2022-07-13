@@ -8,9 +8,6 @@ Controller::Controller(QObject *parent)
 
     m_settings = new Settings(m_db_users);
     load_db();
-
-    m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
-    QObject::connect(m_bot, &Telegram::Bot::update,  this,  &Controller::handle_update);
 }
 Controller::~Controller()
 {
@@ -576,4 +573,22 @@ void Controller::update_bot_info()
     emit update_fn(me.firstname);
     emit update_username(me.username);
     qDebug() << me;
+}
+
+void Controller::start_bot()
+{
+    m_bot = new Telegram::Bot(m_settings->m_token, true, 500, 4);
+    QObject::connect(m_bot, &Telegram::Bot::update,  this,  &Controller::handle_update);
+    qDebug() << "bot started";
+    update_bot_info();
+}
+
+void Controller::stop_bot()
+{
+    if(m_bot)
+    {
+        QObject::disconnect(m_bot, &Telegram::Bot::update,  this,  &Controller::handle_update);
+        delete m_bot;
+        qDebug() << "bot stopped";
+    }
 }

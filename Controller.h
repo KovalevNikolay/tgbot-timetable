@@ -95,6 +95,8 @@ private:
 
 public slots:
     void update_bot_info();
+    void start_bot();
+    void stop_bot();
 };
 
 #endif // CONTROLLER_H

@@ -25,9 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(&m_ctrl, &Controller::update_username, this, &MainWindow::update_username);
 
     QObject::connect(ui->btn_start_bot, &QPushButton::clicked, this, &MainWindow::h_btn_start_stop);
-
-    // upd GUI
-    m_ctrl.update_bot_info();
 }
 MainWindow::~MainWindow()
 {
@@ -49,12 +46,12 @@ void MainWindow::h_btn_start_stop()
 {
     if(ui->btn_start_bot->text() == "Start bot")
     {
-        //m_ctrl.start_bot();
+        m_ctrl.start_bot();
         ui->btn_start_bot->setText("Stop bot");
     }
     else if(ui->btn_start_bot->text() == "Stop bot")
     {
-        //m_ctrl.stop_bot();
+        m_ctrl.stop_bot();
         ui->btn_start_bot->setText("Start bot");
     }
 }
